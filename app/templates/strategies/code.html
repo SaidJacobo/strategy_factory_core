@@ -1,0 +1,149 @@
+{% extends "base.html" %}
+
+{% block title %}New strategy{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.4/codemirror.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.4/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.48.4/mode/python/python.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/closebrackets.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/addon/edit/matchbrackets.js"></script>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid flex-grow-1 d-flex flex-column">
+    <form id="backtest-form" method="POST" action="/strategies/{{ model.StrategyId }}/code" class="flex-grow-1 d-flex flex-column"  data-stream-url="/strategies/stream/">
+        <!-- Barra de herramientas superior -->
+
+        <input type="hidden" id="StrategyId" name="StrategyId" value="{{ model.StrategyId }}">
+
+        <div class="toolbar p-2 d-flex align-items-center form-toolbar">
+            <label for="cash" class="me-2">Cash:</label>
+            <input type="number" id="InitialCash" name="InitialCash" class="form-control me-2" min="0" value="{{ model.InitialCash }}" required>
+            
+            <label for="category" class="me-2">Category:</label>
+            <select id="CategoryId" name="CategoryId" class="form-select me-2">
+                <option value="">Select</option>
+                {% for category in model.Categories %}
+                    <option value="{{ category.Id }}">{{ category.Name }}</option>
+                {% endfor %}
+            </select>
+            
+            <label for="ticker" class="me-2">Ticker:</label>
+            <select id="TickerId" name="TickerId" class="form-select me-2">
+                <option value="">Select</option>
+            </select>
+            
+            <label for="timeframe" class="me-2">Timeframe:</label>
+            <select id="TimeframeId" name="TimeframeId" class="form-select me-2">
+                <option value="">Select</option>
+                {% for timeframe in model.Timeframes %}
+                    <option value="{{ timeframe.Id }}">{{ timeframe.Name }}</option>
+                {% endfor %}
+            </select>
+            
+            <label for="datefrom" class="me-2">From:</label>
+            <input type="date" id="DateFrom" name="DateFrom" class="form-control me-2" value="{{ model.DateFrom }}" required>
+            
+            <label for="dateto" class="me-2">To:</label>
+            <input type="date" id="DateTo" name="DateTo" class="form-control me-2" value="{{ model.DateTo }}" required>
+            
+            <label for="risk" class="me-2">Risk:</label>
+            <input type="number" id="Risk" name="Risk" class="form-control me-2" step="0.01" min="0" max="100" value="{{ model.Risk }}" required>
+            
+            <button type="submit" class="btn btn-primary ms-auto">
+                <i class="fas fa-play-circle"></i>
+            </button>
+        </div>
+
+        <!-- Sección de contenido principal -->
+        <div class="row flex-grow-1">
+            <!-- Sección Izquierda: Editor de Código -->
+            <div id="code-section" class="col-md-6 d-flex flex-column p-3">
+                <textarea id="Code" name="Code" class="w-100 h-100">{{ model.Code | e }}</textarea>
+            </div>
+
+            <!-- Sección Derecha: Consola -->
+            <div id="console-section" class="col-md-6 d-flex flex-column p-3">
+                <div id="log-container" class="console-log flex-grow-1"></div>
+            </div>
+            <div id="loading-indicator" style="display: none;">
+                <i class="fa fa-spinner fa-spin"></i> Processing...
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script src="/static/js/console.js"></script>
+<script src="/static/js/categories_tickers.js"></script>
+<script>
+    strategyId = "{{ model.StrategyId }}";
+    console.log(strategyId)
+
+    window.addEventListener('unload', function () {
+        if (window.editor) {
+            document.getElementById("Code").value = window.editor.getValue();
+        }
+
+        code = document.getElementById("Code").value
+        
+        navigator.sendBeacon(
+            `/strategies/delete_plots/${strategyId}`,
+            new Blob([JSON.stringify({ code })], { type: 'application/json' })
+        );
+    });
+
+    function applyEditorTheme(isDarkMode) {
+        if (editor) {
+            const newTheme = isDarkMode ? 'dracula' : 'default';
+            editor.setOption('theme', newTheme);
+        }
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Asegurar esta configuración en tu inicialización de CodeMirror
+        window.editor = CodeMirror.fromTextArea(document.getElementById("Code"), {
+            lineNumbers: true,
+            mode: "python",
+            autoCloseBrackets: true,
+            matchBrackets: true,
+            highlightNonMatching: true,
+            theme: "default",
+            indentUnit: 4,             // Usar 4 espacios por nivel
+            tabSize: 4,                // Tamaño de tabulación = 4 espacios
+            indentWithTabs: false,      // Usar espacios en lugar de tabulaciones
+            smartIndent: true,         // Indentación inteligente
+            lineWrapping: true,
+            extraKeys: {
+                "Tab": function(cm) {
+                    if (cm.somethingSelected()) {
+                        cm.indentSelection("add");
+                    } else {
+                        cm.replaceSelection("    ", "end"); // 4 espacios
+                    }
+                },
+                "Shift-Tab": function(cm) {
+                    cm.indentSelection("subtract");
+                }
+            }
+        });
+
+        window.editor.setSize("100vh", "100vh");
+
+        // Detectar si está activado el modo oscuro al cargar
+        const isDarkMode = localStorage.getItem("darkMode") === "enabled";
+        applyEditorTheme(isDarkMode);
+    });
+
+    // Responder a cambios de tema en tiempo real
+    document.addEventListener('themeChanged', (e) => {
+        applyEditorTheme(e.detail.isDarkMode);
+    });
+
+</script>
+
+{% endblock %}

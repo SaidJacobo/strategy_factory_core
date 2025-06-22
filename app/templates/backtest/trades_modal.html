@@ -1,0 +1,53 @@
+<!-- Modal de Bootstrap -->
+<div class="modal fade" id="botsModal" tabindex="-1" aria-labelledby="botsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="botsModalLabel">Trades</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table id="performanceTableModal" class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>EntryTime</th>
+                                <th>EntryPrice</th>
+                                <th>Size</th>
+                                <th>ExitTime</th>
+                                <th>ExitPrice</th>
+                                <th>ReturnPct</th>
+                                <th>PnL</th>
+                                <th>NetPnL</th>
+                                <th>Equity</th>
+                                <th>Duration</th>
+                                <th>Commission</th>
+                                <th>TopBest</th>
+                                <th>TopWorst</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for trade in trades %}
+                            <tr>
+                                <td>{{ trade.EntryTime }}</td>
+                                <td>{{ trade.EntryPrice }}</td>
+                                <td>{{ trade.Size }}</td>
+                                <td>{{ trade.ExitTime }}</td>
+                                <td>{{ trade.ExitPrice }}</td>
+                                <td>{{ trade.ReturnPct }}</td>
+                                <td>{{ trade.PnL }}</td>
+                                <td>{{ trade.NetPnL }}</td>
+                                <td>{{ trade.Equity }}</td>
+                                <td>{{ trade.Duration }}</td>
+                                <td>{{ trade.Commission }}</td>
+                                <td>{{ trade.TopBest }}</td>
+                                <td>{{ trade.TopWorst }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

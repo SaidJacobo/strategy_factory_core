@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}Bot Performances{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Bot Performances</h1>
+
+    <div class="d-flex justify-content-end mb-3">
+        <a href="/backtest/new" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i>
+        </a>
+    </div>
+
+    <!-- Tabla de Estrategias -->
+    <div class="table-responsive">
+        <table id="performanceTable" class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Bot</th>
+                    <th>Datefrom</th>
+                    <th>DateTo</th>
+                    <th>Method</th>
+                    <th>SharpeRatio</th>
+                    <th>StabilityRatio</th>
+                    <th>Trades</th>
+                    <th>Return</th>
+                    <th>Drawdown</th>
+                    <th>RreturnDd</th>
+                    <th>StabilityWeightedRar</th>
+                    <th>WinRate</th>
+                    <th>Duration</th>
+                    <th></th>
+                    <th></th>
+
+                </tr>
+            </thead>
+            <tbody>
+                {% for performance in performances %}
+                    <tr>
+                        <td>
+                            <a href='/backtest/bot/{{ performance.BotId }}?date_from={{ performance.DateFrom }}&date_to={{ performance.DateTo }}'>
+                                {{ performance.Bot.Name }}
+                            </a>
+                        </td>
+                        <td>{{ performance.DateFrom }}</td>
+                        <td>{{ performance.DateTo }}</td>
+                        <td>{{ performance.Method }}</td>
+                        <td>{{ performance.SharpeRatio }}</td>
+                        <td>{{ performance.StabilityRatio }}</td>
+                        <td>{{ performance.Trades }}</td>
+                        <td>{{ performance.Return }}</td>
+                        <td>{{ performance.Drawdown }}</td>
+                        <td>{{ performance.RreturnDd }}</td>
+                        <td>{{ performance.StabilityWeightedRar }}</td>
+                        <td>{{ performance.WinRate }}</td>
+                        <td>{{ performance.Duration }}</td>
+                        <td>
+                            <form action="/backtest/{{ performance.Id }}/delete" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este backtest?')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-sm toggle-favorite" data-performance-id="{{ performance.Id }}">
+                                {% if performance.Favorite %}
+                                    <i class="fas fa-star"></i> <!-- Estrella llena -->
+                                {% else %}
+                                    <i class="far fa-star"></i> <!-- Estrella vacía -->
+                                {% endif %}
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    // Selecciona todos los botones con la clase 'toggle-favorite'
+    const favoriteButtons = document.querySelectorAll('.toggle-favorite');
+
+    favoriteButtons.forEach(button => {
+        button.addEventListener('click', async () => {
+            const performanceId = button.getAttribute('data-performance-id');
+            const endpoint = `/backtest/${performanceId}/favorites`;
+
+            try {
+                // Realizar la solicitud POST al endpoint
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const isFavorite = data.item;
+
+                    // Actualizar dinámicamente el ícono del botón
+                    const icon = button.querySelector('i');
+                    if (isFavorite) {
+                        icon.classList.remove('far'); // Estrella vacía
+                        icon.classList.add('fas');   // Estrella llena
+                    } else {
+                        icon.classList.remove('fas'); // Estrella llena
+                        icon.classList.add('far');   // Estrella vacía
+                    }
+                } else {
+                    console.error('Error en la respuesta del servidor:', response.statusText);
+                    alert('Hubo un error al actualizar el estado. Por favor, intenta de nuevo.');
+                }
+            } catch (error) {
+                console.error('Error al realizar la solicitud:', error);
+                alert('Hubo un error al comunicarte con el servidor. Por favor, intenta de nuevo.');
+            }
+        });
+    });
+
+    $(document).ready(function () {
+        $('#performanceTable').DataTable({
+            paging: true, // Activar paginación
+            searching: true, // Activar búsqueda
+            ordering: true, // Activar ordenamiento
+            info: true, // Mostrar información
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.5/i18n/Spanish.json' // Traducción al español
+            },
+            order: [[9, 'desc']] // Desactiva el orden inicial
+
+        });
+    });
+</script>
+
+{% endblock %}

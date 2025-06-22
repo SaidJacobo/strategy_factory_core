@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+
+{% block title %}Used strategies{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Backtests</h1>
+
+    <div class="d-flex justify-content-end mb-3">
+        <a href="/backtest/new" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i>
+        </a>
+        <a href="/backtest/search" class="btn btn-primary">
+            <i class="fas fa-magnifying-glass"></i>
+        </a>
+    </div>
+
+    <!-- Tabla de Estrategias -->
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Strategy</th>
+                    <th>Description</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for strategy in strategies %}
+                <tr>
+                    <td>{{ strategy.Name }}</td>
+                    <td>{{ strategy.Description }}</td>
+                    <td>
+                        <a href="#" class="view-bots btn btn-success" data-strategy-id="{{ strategy.Id }}">
+                            <i class="fas fa-money-bill-wave" aria-hidden="true"></i>
+                        </a>
+                    </td>
+                    <td>
+                        <a href="#" class="view-robusts btn btn-primary" data-strategy-id="{{ strategy.Id }}">
+                            <i class="fas fa-bolt" aria-hidden="true"></i>
+                        </a>
+                    </td>
+                    <td>
+                        <form action="/backtest/strategies/{{ strategy.Id }}/delete" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta estrategia?')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<div id="modal-container"></div>
+
+
+
+<script>
+
+    $(document).ready(function () {
+        // Escuchar eventos de los botones "view-robusts" y "view-bots"
+        const actionButtons = document.querySelectorAll('.view-robusts, .view-bots');
+        const modalContainer = document.getElementById('modal-container'); // Contenedor para el modal dinámico
+    
+        actionButtons.forEach(button => {
+            button.addEventListener('click', async () => {
+                const strategyId = button.getAttribute('data-strategy-id');
+                let endpoint = '';
+    
+                // Determinar el endpoint según el botón clicado
+                if (button.classList.contains('view-robusts')) {
+                    endpoint = `/backtest/strategies/${strategyId}/get_robusts`;
+                } else if (button.classList.contains('view-bots')) {
+                    endpoint = `/backtest/strategies/${strategyId}/tickers`;
+                }
+    
+                try {
+                    // Hacer solicitud al endpoint
+                    const response = await fetch(endpoint);
+                    if (response.ok) {
+                        const modalHtml = await response.text();
+    
+                        // Inyectar el contenido del modal dinámico
+                        modalContainer.innerHTML = modalHtml;
+    
+                        // Inicializar el modal de Bootstrap
+                        const modalElement = modalContainer.querySelector('.modal');
+                        const dynamicModal = new bootstrap.Modal(modalElement);
+                        dynamicModal.show();
+    
+                        // Inicializar DataTables en la tabla cargada dinámicamente
+                        $(modalElement).on('shown.bs.modal', function () {
+                            const tableId = '#performanceTableModal'; // ID de la tabla
+                            if (!$.fn.DataTable.isDataTable(tableId)) {
+                                $(tableId).DataTable({
+                                    paging: true,
+                                    searching: true,
+                                    ordering: true,
+                                    info: true,
+                                    language: {
+                                        url: '//cdn.datatables.net/plug-ins/1.13.5/i18n/Spanish.json',
+                                    },
+                                    order: [[5, 'desc']] // Desactiva el orden inicial
+
+                                });
+                            }
+                        });
+    
+                        // Destruir DataTable al cerrar el modal para evitar errores
+                        $(modalElement).on('hidden.bs.modal', function () {
+                            const table = $('#performanceTableModal').DataTable();
+                            table.destroy();
+                        });
+                    } else {
+                        console.error('Error en la respuesta del servidor:', response.statusText);
+                        alert('Hubo un error al cargar los datos. Por favor, intenta de nuevo.');
+                    }
+                } catch (error) {
+                    console.error('Error al cargar los datos del servidor:', error);
+                    alert('Hubo un error al cargar los datos. Por favor, intenta de nuevo.');
+                }
+            });
+        });
+    });
+
+</script>
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}Modificar Estrategia{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-4">Update strategy</h1>
+    <form action="/strategies/{{ strategy.Id }}" method="post" class="w-50 mx-auto p-4 rounded shadow-sm">
+        <!-- Campo oculto para el ID -->
+        <input type="hidden" id="id" name="id" value="{{ strategy.Id }}">
+
+        <!-- Campo de nombre -->
+        <div class="mb-3">
+            <label for="name" class="form-label">Nombre de la estrategia:</label>
+            <input type="text" id="name" name="name" value="{{ strategy.Name }}" class="form-control" required>
+        </div>
+        
+        <!-- Campo de descripción -->
+        <div class="mb-3">
+            <label for="description" class="form-label">Descripción:</label>
+            <textarea id="description" name="description" class="form-control" rows="4" required>{{ strategy.Description }}</textarea>
+        </div>
+        <div class="mb-3">
+            <label for="metatrader_name" class="form-label">MetaTrader Name:</label>
+            <input id="metatrader_name" name="metatrader_name"  value="{{ strategy.MetaTraderName }}" class="form-control" required>
+        </div>
+        <!-- Botón de enviar -->
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

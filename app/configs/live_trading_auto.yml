@@ -1,0 +1,202 @@
+breakout_channel.BreakoutChannel1:
+  instruments_info:
+    META:
+      risk: 0.1
+      timeframe: H1
+    NVDA:
+      risk: 0.2
+      timeframe: H1
+    TSLA:
+      risk: 0.5
+      timeframe: H2
+    US100.cash:
+      risk: 0.1
+      timeframe: H6
+  metatrader_name: boch1
+  opt_params: null
+  wfo_params:
+    look_back_bars: 200
+    use_wfo: false
+    warmup_bars: 200
+breakout_channel2.BreakoutChannel2:
+  instruments_info:
+    EURUSD:
+      risk: 0.4
+      timeframe: H3
+    META:
+      risk: 0.3
+      timeframe: H3
+    NVDA:
+      risk: 0.3
+      timeframe: H1
+    TSLA:
+      risk: 0.5
+      timeframe: H1
+    US100.cash:
+      risk: 0.1
+      timeframe: H4
+  metatrader_name: boch2
+  opt_params: null
+  wfo_params:
+    look_back_bars: 200
+    use_wfo: false
+    warmup_bars: 200
+breakout_channel3.BreakoutChannel3:
+  instruments_info:
+    META:
+      risk: 0.2
+      timeframe: H1
+    US100.cash:
+      risk: 0.15
+      timeframe: H2
+    US500.cash:
+      risk: 0.55
+      timeframe: H2
+  metatrader_name: boch3
+  opt_params: null
+  wfo_params:
+    look_back_bars: 200
+    use_wfo: false
+    warmup_bars: 200
+breakout_channel4.BreakoutChannel4:
+  instruments_info:
+    EURUSD:
+      risk: 0.3
+      timeframe: H4
+    US100.cash:
+      risk: 0.1
+      timeframe: H1
+    US500.cash:
+      risk: 0.45
+      timeframe: H1
+  metatrader_name: boch4
+  opt_params: null
+  wfo_params:
+    look_back_bars: 200
+    use_wfo: false
+    warmup_bars: 200
+mean_rev_bbands_cross_1.MeanRevBbandsCross1:
+  instruments_info:
+    EURNZD:
+      risk: 0.5
+      timeframe: H4
+    EURUSD:
+      risk: 0.1
+      timeframe: H6
+    GBPUSD:
+      risk: 0.05
+      timeframe: H6
+  metatrader_name: mrbb1
+  opt_params: null
+  wfo_params:
+    look_back_bars: 200
+    use_wfo: false
+    warmup_bars: 200
+mean_rev_bbands_cross_2.MeanRevBbandsCross2:
+  instruments_info:
+    EURNZD:
+      risk: 0.5
+      timeframe: H4
+    EURUSD:
+      risk: 0.1
+      timeframe: H4
+    GBPUSD:
+      risk: 0.1
+      timeframe: H4
+    US100.cash:
+      risk: 0.4
+      timeframe: H6
+  metatrader_name: mrbb2
+  opt_params: null
+  wfo_params:
+    look_back_bars: 200
+    use_wfo: false
+    warmup_bars: 200
+mean_rev_bbands_cross_3.MeanRevBbandsCross3:
+  instruments_info:
+    EURUSD:
+      risk: 0.2
+      timeframe: H1
+    GBPUSD:
+      risk: 0.1
+      timeframe: H1
+    US100.cash:
+      risk: 0.3
+      timeframe: H1
+  metatrader_name: mrbb3
+  opt_params: null
+  wfo_params:
+    look_back_bars: 200
+    use_wfo: false
+    warmup_bars: 200
+trend_following_triple_sma1.TripleSMA1:
+  instruments_info:
+    GBPJPY:
+      risk: 0.2
+      timeframe: H4
+    META:
+      risk: 0.3
+      timeframe: H1
+    NVDA:
+      risk: 0.3
+      timeframe: H1
+    US100.cash:
+      risk: 0.2
+      timeframe: H1
+    USDJPY:
+      risk: 0.2
+      timeframe: H1
+  metatrader_name: tfsma1
+  opt_params: null
+  wfo_params:
+    look_back_bars: 200
+    use_wfo: false
+    warmup_bars: 200
+trend_following_triple_sma2.TripleSMA2:
+  instruments_info:
+    GBPJPY:
+      risk: 0.2
+      timeframe: H3
+    META:
+      risk: 0.2
+      timeframe: H1
+    NVDA:
+      risk: 0.4
+      timeframe: H2
+    US100.cash:
+      risk: 0.3
+      timeframe: H1
+    USDJPY:
+      risk: 0.2
+      timeframe: H3
+  metatrader_name: tfsma2
+  opt_params: null
+  wfo_params:
+    look_back_bars: 200
+    use_wfo: false
+    warmup_bars: 200
+trend_following_triple_sma3.TripleSMA3:
+  instruments_info:
+    GBPJPY:
+      risk: 0.1
+      timeframe: H4
+    USDJPY:
+      risk: 0.3
+      timeframe: H1
+  metatrader_name: tfsma3
+  opt_params: null
+  wfo_params:
+    look_back_bars: 200
+    use_wfo: false
+    warmup_bars: 200
+trend_following_triple_sma4.TripleSMA4:
+  instruments_info:
+    GBPJPY:
+      risk: 0.3
+      timeframe: H1
+  metatrader_name: tfsma4
+  opt_params: null
+  wfo_params:
+    look_back_bars: 200
+    use_wfo: false
+    warmup_bars: 200

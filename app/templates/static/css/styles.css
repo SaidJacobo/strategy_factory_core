@@ -1,0 +1,502 @@
+/* Variables para modo claro (por defecto) */
+:root {
+    --primary-bg: #ffffff;
+    --primary-text: #000000;
+    --secondary-text: #555555;
+    --highlight-text: #000000;
+    --border-color: #dee2e6;
+
+    --header-bg: #f8f9fa;
+    --header-text: #000000;
+    --hover-bg: #f1f1f1;
+
+    --primary-button-bg:rgba(0, 123, 255, 0);
+    --primary-button-text: #007bff;;
+
+    --danger-button-bg:rgba(220, 53, 70, 0);
+    --danger-button-text:rgb(255, 0, 0);
+
+    --success-button-bg:rgba(105, 161, 118, 0);
+    --success-button-text:rgb(0, 0, 0);
+
+    --warning-button-bg:rgba(255, 193, 7, 0);
+    --warning-button-text:rgb(0, 0, 0);
+
+    --button-hover-bg: #0056b3;
+    --button-border-radius: 4px;
+    --button-padding: 10px 15px;
+}
+
+/* Variables para modo oscuro */
+body.dark-mode {
+    --primary-bg: #121212;
+    --primary-text: #f0f0f0;
+    --secondary-text: #aaaaaa;
+    --highlight-text: #ffffff;
+    --border-color: #333333;
+
+    --header-bg: #1e1e1e;
+    --header-text: #ffffff;
+    --hover-bg: #333333;
+
+    --primary-button-bg:rgba(55, 90, 127, 0);
+    --primary-button-text:rgb(255, 255, 255);
+
+    --danger-button-bg:rgba(129, 96, 95, 0);
+    --danger-button-text: #d9534f;
+
+    --success-button-bg:rgba(92, 184, 92, 0);
+    --success-button-text: #ffffff;
+
+    --warning-button-bg:rgba(240, 172, 78, 0);
+    --warning-button-text:rgb(255, 255, 255);
+}
+
+html, body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--primary-bg);
+    color: var(--primary-text);
+    min-height: 100vh;
+}
+
+/* Títulos centrados */
+h1, h2, h3, h4 {
+    text-align: center;
+    margin-bottom: 1.25rem;
+    color: var(--primary-text);
+    font-weight: 300;
+}
+
+h1 {
+    font-size: 2rem;
+}
+
+h2 {
+    font-size: 1.75rem;
+}
+
+h3 {
+    font-size: 1.5rem;
+}
+
+h4 {
+    font-size: 1rem;
+}
+
+/* Estilo de las Tablas */
+.table.table-custom {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table.table-custom th {
+    background-color: var(--header-bg) !important;
+    color: var(--header-text) !important;
+    font-size: 0.85rem !important;
+    padding: 10px !important;
+    text-align: center !important;
+}
+
+.table.table-custom td {
+    padding: 4px 5px !important;
+    font-size: 0.85rem !important;
+    color: var(--highlight-text) !important;
+    text-align: center !important;
+    background-color: var(--primary-bg); /* Fondo dinámico */
+    border-bottom: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.table.table-custom th,
+.table.table-custom td {
+    color: var(--highlight-text);
+}
+
+
+.table.table-custom tbody tr:nth-child(even) {
+    background-color: var(--primary-bg) !important;
+}
+
+.table.table-custom tbody tr:hover {
+    background-color: var(--hover-bg) !important;
+}
+
+/* Botón Base */
+.btn {
+    display: inline-block;
+    padding: var(--button-padding);
+    font-size: 1rem;
+    font-weight: 400;
+    text-align: center;
+    text-decoration: none;
+    color: var(--primary-text);
+    border: none;
+    border-radius: var(--button-border-radius);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Botones Específicos */
+.btn-primary {
+    background-color: var(--primary-button-bg);
+    color: var(--primary-button-text);
+}
+
+.btn-primary:hover {
+    background-color: var(--button-hover-bg);
+}
+
+.btn-danger {
+    background-color: var(--danger-button-bg);
+    color: var(--danger-button-text);
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+}
+
+.btn-success {
+    background-color: var(--success-button-bg);
+    color: var(--success-button-text);
+}
+
+.btn-success:hover {
+    background-color: #218838;
+}
+
+.btn-warning {
+    background-color: var(--warning-button-bg);
+    color: var(--warning-button-text);
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+}
+
+/* Botones en Bloque */
+.btn-block {
+    display: block;
+    width: 100%;
+}
+
+/* Cards: Asegurar que usen las variables dinámicas */
+.card {
+    background-color: var(--primary-bg);
+    color: var(--primary-text);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+/* Card headers */
+.card-header {
+    background-color: var(--header-bg);
+    color: var(--header-text);
+    font-weight: bold;
+}
+
+/* Card bodies */
+.card-body {
+    background-color: var(--primary-bg);
+    color: var(--primary-text);
+}
+
+
+/* Asegurar contraste en títulos */
+h1, h2, h3, h4 {
+    color: var(--primary-text);
+}
+
+/* Asegurar contraste para las celdas de tablas */
+.table.table-custom th {
+    background-color: var(--header-bg);
+    color: var(--header-text);
+    font-size: 0.9rem;
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid var(--border-color);
+}
+
+
+/* Hover dinámico para filas */
+.table.table-custom tbody tr:hover td {
+    background-color: var(--hover-bg);
+    color: var(--highlight-text);
+}
+
+
+#dark-mode-toggle {
+    display: inline-flex; /* Asegura que el botón se alinee correctamente */
+    align-items: center; /* Centra el contenido verticalmente */
+    justify-content: center; /* Centra el contenido horizontalmente */
+    padding: 0.4rem; /* Ajusta el espacio interno */
+    font-size: 1rem; /* Ajusta el tamaño del ícono */
+    margin: 0; /* Elimina márgenes adicionales */
+    vertical-align: middle; /* Alinea con el texto */
+    line-height: 1; /* Corrige posibles problemas de altura de línea */
+}
+
+#dark-mode-toggle i {
+    font-size: 1rem; /* Asegura que el ícono tenga un tamaño consistente */
+    line-height: 1; /* Alinea correctamente el ícono */
+}
+
+.navbar {
+    display: flex;
+    align-items: center; /* Centra verticalmente todos los elementos */
+}
+
+/* Ajuste de estilo para el modo oscuro */
+body.dark-mode {
+    background-color: #181818;
+    color: #eaeaea;
+}
+
+/* Ajustes adicionales cuando el modo oscuro está activado */
+body.dark-mode #dark-mode-toggle {
+    background-color: #333;
+    color: #fff;
+}
+
+/* Formularios: Estilo base */
+input, textarea, select, button {
+    font-family: inherit;
+    font-size: 1rem;
+    padding: 0.5rem;
+    margin: 0.5rem 0;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--primary-bg);
+    color: var(--primary-text);
+    transition: all 0.3s ease;
+}
+
+/* Placeholder (texto sugerido) */
+input::placeholder, textarea::placeholder {
+    color: var(--secondary-text);
+}
+
+/* Enfoque (focus) */
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-button-bg);
+    box-shadow: 0 0 5px var(--primary-button-bg);
+}
+
+/* Select dinámico */
+select {
+    background-color: var(--primary-bg);
+    color: var(--primary-text);
+    border: 1px solid var(--border-color);
+}
+
+/* Botones dentro de formularios */
+button {
+    background-color: var(--primary-button-bg);
+    color: var(--primary-button-text);
+    cursor: pointer;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: var(--button-border-radius);
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background-color: var(--button-hover-bg);
+}
+
+/* Deshabilitados */
+input:disabled, textarea:disabled, select:disabled, button:disabled {
+    background-color: var(--hover-bg);
+    color: var(--secondary-text);
+    cursor: not-allowed;
+}
+
+/* Formularios en modo oscuro */
+body.dark-mode input, 
+body.dark-mode textarea, 
+body.dark-mode select {
+    background-color: var(--header-bg);
+    color: var(--highlight-text);
+    border: 1px solid var(--border-color);
+}
+
+body.dark-mode input::placeholder,
+body.dark-mode textarea::placeholder {
+    color: var(--secondary-text);
+}
+
+/* Sobrescribir colores del modal en modo oscuro */
+.dark-mode .modal-content {
+    background-color: #222; /* Fondo oscuro */
+    border: 1px solid #444; /* Borde oscuro */
+    color: #fff; /* Texto blanco */
+}
+
+.dark-mode .modal-header,
+.dark-mode .modal-footer {
+    border-color: #555; /* Bordes internos */
+}
+
+.table-custom th,
+.table-custom td {
+    vertical-align: middle; /* Centra el contenido verticalmente */
+    text-align: center; /* Opcional: centra horizontalmente el contenido */
+    white-space: nowrap; /* Evita saltos de línea dentro de las celdas */
+}
+
+.table-custom td {
+    padding: 0.5rem; /* Ajusta el espacio para que las filas sean más uniformes */
+}
+
+.table-custom .btn-danger {
+    display: inline-flex; /* Asegura que el ícono no ocupe espacio extra */
+    align-items: center; /* Centra el ícono dentro del botón */
+    justify-content: center;
+    padding: 0.3rem; /* Reduce el tamaño del botón */
+}
+
+.table-custom .btn-danger i {
+    font-size: 0.9rem; /* Ajusta el tamaño del ícono si es necesario */
+    line-height: 1; /* Elimina cualquier desajuste de altura */
+}
+
+.table-custom .btn-primary {
+    display: inline-flex; /* Asegura que el ícono no ocupe espacio extra */
+    align-items: center; /* Centra el ícono dentro del botón */
+    justify-content: center;
+    padding: 0.3rem; /* Reduce el tamaño del botón */
+}
+
+.table-custom .btn-primary i {
+    font-size: 0.9rem; /* Ajusta el tamaño del ícono si es necesario */
+    line-height: 1; /* Elimina cualquier desajuste de altura */
+}
+
+.table-custom .btn-warning {
+    display: inline-flex; /* Asegura que el ícono no ocupe espacio extra */
+    align-items: center; /* Centra el ícono dentro del botón */
+    justify-content: center;
+    padding: 0.3rem; /* Reduce el tamaño del botón */
+}
+
+.table-custom .btn-warning i {
+    font-size: 0.9rem; /* Ajusta el tamaño del ícono si es necesario */
+    line-height: 1; /* Elimina cualquier desajuste de altura */
+}
+
+.table-custom .btn-success {
+    display: inline-flex; /* Asegura que el ícono no ocupe espacio extra */
+    align-items: center; /* Centra el ícono dentro del botón */
+    justify-content: center;
+    padding: 0.3rem; /* Reduce el tamaño del botón */
+}
+
+.table-custom .btn-success i {
+    font-size: 0.9rem; /* Ajusta el tamaño del ícono si es necesario */
+    line-height: 1; /* Elimina cualquier desajuste de altura */
+}
+
+
+#floating-button-container {
+    position: fixed;
+    bottom: 80px;
+    right: 150px;
+    z-index: 1000;
+}
+
+#floating-favorite-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+#floating-favorite-button:hover {
+    background-color: #0056b3;
+}
+
+/* Reemplazar por esto: */
+.container-fluid.flex-grow-1 {
+    height: calc(100vh - 112px); /* Restar altura del header y footer */
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+}
+
+/* Ajustar el formulario principal */
+#backtest-form {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Ajustar la fila principal */
+#backtest-form .row {
+    margin: 0;
+    flex: 1;
+    min-height: 0; /* Importante para el scroll interno */
+}
+
+/* Ajustar las columnas */
+#code-section, #console-section {
+    height: 100%;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 0; /* Importante para el scroll interno */
+}
+
+#console-section {
+    background-color: black;
+    color: white;
+    font-family: monospace;
+}
+
+/* Editor de código */
+.CodeMirror {
+    height: 100% !important;
+    flex: 1;
+    min-height: 0; /* Importante para el scroll interno */
+}
+
+/* Consola */
+#log-container {
+    flex: 1;
+    min-height: 0; /* Importante para el scroll interno */
+    overflow-y: auto;
+}
+
+/* Barra de herramientas */
+.toolbar {
+    flex-shrink: 0;
+    padding: 0.5rem 1rem;
+}
+
+/* Ajustar el textarea inicial (se ocultará) */
+#Code {
+    display: none;
+}
+
+.form-toolbar {
+    background-color: var(--header-bg);
+    color: var(--header-text);
+}
+
+.disabled-link {
+    pointer-events: none;
+    opacity: 0.5;
+}

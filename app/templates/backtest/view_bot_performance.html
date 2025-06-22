@@ -1,0 +1,589 @@
+{% extends "base.html" %}
+
+{% block title %}Bot Performance{% endblock %}
+
+{% block content %}
+
+<div class="container my-5">
+    <div class="fixed-header">
+        <h1><i class="fa-solid fa-robot"></i></h1>
+        <h1>{{ performance.Bot.Name }} Performance</h1>
+    </div>
+    <h2>{{ performance.DateFrom }} to {{ performance.DateTo }} with ${{ performance.InitialCash }}</h2>
+    <div id="floating-button-container">
+        <button 
+            id="floating-favorite-button" 
+            class="btn btn-primary btn-circle"
+            data-performance-id="{{ performance.Id }}">
+            {% if performance.Favorite %}
+                <i class="fas fa-star"></i> <!-- Estrella llena -->
+            {% else %}
+                <i class="far fa-star"></i> <!-- Estrella vacía -->
+            {% endif %}
+        </button>
+    </div>
+
+    <!-- Información General -->
+    <div class="card shadow-sm my-5">
+        <div class="card-body">
+            <section class="mb-5">
+                <h2>General Performance</h2>
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Sharpe Ratio</th>
+                            <th>Stability Ratio</th>
+                            <th>Win Rate</th>
+                            <th>Trades</th>
+                            <th>Return</th>
+                            <th>Drawdown</th>
+                            <th>Return/DD</th>
+                            <th>Stability Weighted Rar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ performance.SharpeRatio }}</td>
+                            <td>{{ performance.StabilityRatio }}</td>
+                            <td>{{ performance.WinRate }}</td>
+                            <td>{{ performance.Trades }}</td>
+                            <td>{{ performance.Return }}</td>
+                            <td>{{ performance.Drawdown }}</td>
+                            <td>{{ performance.RreturnDd }}</td>
+                            <td>{{ performance.StabilityWeightedRar }}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Exposure%</th>
+                            <th>KellyCriterion</th>
+                            <th>Duration (days)</th>
+                            <th>WinRate p-value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ performance.ExposureTime }}</td>
+                            <td>{{ performance.KellyCriterion }}</td>
+                            <td>{{ performance.Duration }}</td>
+                            <td>{{ performance.WinratePValue }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Skew</th>
+                            <th>Kurtosis</th>
+                            <th>Jarque Bera</th>
+                            <th>Jarque Bera p-value</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ performance.Skew }}</td>
+                            <td>{{ performance.Kurtosis }}</td>
+                            <td>{{ performance.JarqueBeraStat }}</td>
+                            <td>{{ performance.JarqueBeraPValue }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="container my-5">
+                    <a href='/backtest/ticker/{{ performance.Bot.TickerId }}?strategy_id={{ performance.Bot.StrategyId }}'><< Family</a>
+                </div>
+
+                <div id="equity-plot"></div>
+                
+                <div class="container my-5">
+                    {% if performance.HasBacktestingPyPlot %}
+                        <a href="/backtest_plots/{{ performance.Bot.Name }}_{{ performance.DateFrom.strftime('%Y%m%d') }}_{{ performance.DateTo.strftime('%Y%m%d') }}.html" target="_blank">Open bt.py file</a>
+                        <br>
+                        {% endif %}
+                    {% if performance.HasReport %}
+                        <a href="/backtest_plots/reports/{{ performance.Bot.Name }}_{{ performance.DateFrom.strftime('%Y%m%d') }}_{{ performance.DateTo.strftime('%Y%m%d') }}.html" target="_blank">Open report</a>
+                        <br>
+                    {% endif %}
+                    <a href="#" class="open-modal" data-url="/backtest/{{ performance.Id }}/trades">Trades</a>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Trade Performance -->
+    <div class="card shadow-sm my-5">
+        <div class="card-body">
+            <section class="mb-5">
+                <h2>Trade Performance</h2>
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Win Rate</th>
+                            <th>Profit Factor</th>
+                            <th>Mean Return (%)</th>
+                            <th>Std Return (%)</th>
+                            <th>Mean Trade Duration (days)</th>
+                            <th>Std Trade Duration (days)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ performance.BotTradePerformance.WinRate }}</td>
+                            <td>{{ performance.BotTradePerformance.ProfitFactor }}</td>
+                            <td>{{ performance.BotTradePerformance.MeanReturnPct }}</td>
+                            <td>{{ performance.BotTradePerformance.StdReturnPct }}</td>
+                            <td>{{ performance.BotTradePerformance.MeanTradeDuration }}</td>
+                            <td>{{ performance.BotTradePerformance.StdTradeDuration }}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="mb-5">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Mean Winning Return (%)</th>
+                            <th>Std Winning Return (%)</th>
+                            <th>Mean Losing Return (%)</th>
+                            <th>Std Losing Return (%)</th>
+                            <th>Expected Trade Return</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ performance.BotTradePerformance.MeanWinningReturnPct }}</td>
+                            <td>{{ performance.BotTradePerformance.StdWinningReturnPct }}</td>
+                            <td>{{ performance.BotTradePerformance.MeanLosingReturnPct }}</td>
+                            <td>{{ performance.BotTradePerformance.StdLosingReturnPct }}</td>
+                            <td>{{ performance.BotTradePerformance.ExpectedTradeReturn }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            <section class="mb-5">
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Consecutive Wins</th>
+                            <th>Consecutive Losses</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ performance.BotTradePerformance.ConsecutiveWins }}</td>
+                            <td>{{ performance.BotTradePerformance.ConsecutiveLosses }}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Long Trades -->
+            <section class="mb-5">
+                <h3>Long vs Short trade Performance</h3>
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Win Rate</th>
+                            <th>Count</th>
+                            <th>Mean Return (%)</th>
+                            <th>Std Return (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Long trades</td>
+                            <td>{{ performance.BotTradePerformance.LongWinrate }}</td>
+                            <td>{{ performance.BotTradePerformance.LongCount }}</td>
+                            <td>{{ performance.BotTradePerformance.LongMeanReturnPct }}</td>
+                            <td>{{ performance.BotTradePerformance.LongStdReturnPct }}</td>
+                        </tr>
+                        <tr>
+                            <td>Short Trades</td>
+                            <td>{{ performance.BotTradePerformance.ShortWinrate }}</td>
+                            <td>{{ performance.BotTradePerformance.ShortCount }}</td>
+                            <td>{{ performance.BotTradePerformance.ShortMeanReturnPct }}</td>
+                            <td>{{ performance.BotTradePerformance.ShortStdReturnPct }}</td>
+
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Win Mean Return (%)</th>
+                            <th>Win Std Return (%)</th>
+                            <th>Lose Mean Return (%)</th>
+                            <th>Lose Std Return (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Long trades</td>
+                            <td>{{ performance.BotTradePerformance.WinLongMeanReturnPct }}</td>
+                            <td>{{ performance.BotTradePerformance.WinLongStdReturnPct }}</td>
+                            <td>{{ performance.BotTradePerformance.LoseLongMeanReturnPct }}</td>
+                            <td>{{ performance.BotTradePerformance.LoseLongStdReturnPct }}</td>
+                        </tr>
+                        <tr>
+                            <td>Short Trades</td>
+                            <td>{{ performance.BotTradePerformance.WinShortMeanReturnPct }}</td>
+                            <td>{{ performance.BotTradePerformance.WinShortStdReturnPct }}</td>
+                            <td>{{ performance.BotTradePerformance.LoseShortMeanReturnPct }}</td>
+                            <td>{{ performance.BotTradePerformance.LoseShortStdReturnPct }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
+    </div>
+
+    <!-- t-test -->
+    <div class="card shadow-sm my-5">
+        <div class="card-body">
+            <section class="mb-5">
+                <h2>T Test</h2>
+                {% if performance.HasTTest %}
+                    <div id="t-test-plot"></div>
+
+                {% else %}
+                    <div class="d-flex justify-content-end mb-3">
+                        <form action="/backtest/{{ performance.Id }}/t_test" method="post">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-play-circle" aria-hidden="true"></i>
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+
+            </section>
+        </div>
+    </div>
+
+  <!-- Random Test -->
+    <div class="card shadow-sm my-5">
+        <div class="card-body">
+            <section class="mb-5">
+                <h2>Random Test</h2>
+                {% if performance.RandomTest %}
+                    <!-- Tabla de resultados -->
+                    <div class="table-responsive mb-5">
+                        <h3>General performance</h3>
+                        <table class="table table-custom">
+                            <thead class="thead-dark">
+                                <tr class="text-center">
+                                    <th></th>
+                                    <th>Mean Diff</th>
+                                    <th>Std Diff</th>
+                                    <th>p-value</th>
+                                    <th>Z Score</th>
+ 
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="text-center">
+                                    <td>Return</td>
+                                    <td>{{ performance.RandomTest.ReturnMeanDiff }}</td>
+                                    <td>{{ performance.RandomTest.ReturnStdDiff }}</td>
+                                    <td>{{ performance.RandomTest.ReturnPValue }}</td>
+                                    <td>{{ performance.RandomTest.ReturnZScore }}</td>
+                                </tr>
+                                <tr class="text-center">
+                                    <td>Drawdown</td>
+                                    <td>{{ performance.RandomTest.DrawdownMeanDiff }}</td>
+                                    <td>{{ performance.RandomTest.DrawdownStdDiff }}</td>
+                                    <td>{{ performance.RandomTest.DrawdownPValue }}</td>
+                                    <td>{{ performance.RandomTest.DrawdownZScore }}</td>
+                                </tr>
+                                <tr class="text-center">
+                                    <td>Return/dd</td>
+                                    <td>{{ performance.RandomTest.ReturnDdMeanDiff }}</td>
+                                    <td>{{ performance.RandomTest.ReturnDdStdDiff }}</td>
+                                    <td>{{ performance.RandomTest.ReturnDdPValue }}</td>
+                                    <td>{{ performance.RandomTest.ReturnDdZScore }}</td>
+                                </tr>
+                                <tr class="text-center">
+                                    <td>Winrate</td>
+                                    <td>{{ performance.RandomTest.WinrateMeanDiff }}</td>
+                                    <td>{{ performance.RandomTest.WinrateStdDiff }}</td>
+                                    <td>{{ performance.RandomTest.WinratePValue }}</td>
+                                    <td>{{ performance.RandomTest.WinrateZScore }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                {% else %}
+                    <div class="d-flex justify-content-end mb-3">
+                        <button class="btn btn-primary open-modal" data-url="/backtest/{{ performance.Id }}/random_test">
+                            <i class="fas fa-play-circle" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                {% endif %}
+
+                
+            </section>
+        </div>
+    </div>
+
+    <!-- Montecarlo -->
+    <div class="card shadow-sm my-5">
+        <div class="card-body">
+            <section class="mb-5">
+                <h2>Montecarlo</h2>
+                {% if performance.MontecarloTest %}
+                <table class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Drawdown (%)</th>
+                            <th>Final Return (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set grouped = {} %}
+                        {% for metric in performance.MontecarloTest.Metrics %}
+                            {% if metric.Metric not in grouped %}
+                                {% set _ = grouped.update({metric.Metric: {"Drawdown (%)": None, "Final Return (%)": None}}) %}
+                            {% endif %}
+                            {% set _ = grouped[metric.Metric].update({metric.ColumnName: metric.Value}) %}
+                        {% endfor %}
+            
+                        {% set desired_order = ['count', 'mean', 'std', 'min', '5%', '10%', '25%', '50%', '75%', '90%', '95%', 'max', 'Risk of Ruin'] %}
+                        {% for metric_name in desired_order %}
+                            {% if metric_name in grouped %}
+                                <tr>
+                                    <td>{{ metric_name }}</td>
+                                    <td>{{ grouped[metric_name]["Drawdown (%)"] or "N/A" }}</td>
+                                    <td>{{ grouped[metric_name]["Final Return (%)"] or "N/A" }}</td>
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="d-flex justify-content-end mb-3">
+                    <button class="btn btn-primary open-modal" data-url="/backtest/{{ performance.Id }}/montecarlo">
+                        <i class="fas fa-play-circle" aria-hidden="true"></i>
+                    </button>
+                </div>
+            {% endif %}
+                
+            </section>
+        </div>
+    </div>
+
+    <!-- Luck Test -->
+    <div class="card shadow-sm my-5">
+        <div class="card-body">
+            <section class="mb-5">
+                <h2 class="text-center mb-4">Luck Test</h2>
+    
+                {% if performance.LuckTest %}
+                    <!-- Tabla de resultados -->
+                    <div class="table-responsive mb-5">
+                        <table class="table table-custom">
+                            <thead class="thead-dark">
+                                <tr class="text-center">
+                                    <th></th>
+                                    <th>Stability Ratio</th>
+                                    <th>Trades</th>
+                                    <th>Return</th>
+                                    <th>Drawdown</th>
+                                    <th>Return/DD</th>
+                                    <th>Custom Metric</th>
+                                    <th>Win Rate</th>
+                                    <th>Duration</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>{{ performance.Method }}</td>
+                                    <td>{{ performance.StabilityRatio }}</td>
+                                    <td>{{ performance.Trades }}</td>
+                                    <td>{{ performance.Return }}</td>
+                                    <td>{{ performance.Drawdown }}</td>
+                                    <td>{{ performance.RreturnDd }}</td>
+                                    <td>{{ performance.StabilityWeightedRar }}</td>
+                                    <td>{{ performance.WinRate }}</td>
+                                    <td>{{ performance.Duration }}</td>
+                                </tr>
+                                <tr class="text-center">
+                                    <td>Luck Test</td>
+                                    <td>{{ performance.LuckTest.LuckTestPerformance.StabilityRatio }}</td>
+                                    <td>{{ performance.LuckTest.LuckTestPerformance.Trades }}</td>
+                                    <td>{{ performance.LuckTest.LuckTestPerformance.Return }}</td>
+                                    <td>{{ performance.LuckTest.LuckTestPerformance.Drawdown }}</td>
+                                    <td>{{ performance.LuckTest.LuckTestPerformance.RreturnDd }}</td>
+                                    <td>{{ performance.LuckTest.LuckTestPerformance.StabilityWeightedRar }}</td>
+                                    <td>{{ performance.LuckTest.LuckTestPerformance.WinRate }}</td>
+                                    <td>{{ performance.LuckTest.LuckTestPerformance.Duration }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div id="luck-test-plot" style="width: 100%; height: 500px;" class="mb-5"></div>
+                    </div>
+    
+                    <!-- Gráfico Luck Test -->
+                    
+                    {% else %}
+                        <div class="d-flex justify-content-end mb-3">
+                            <button class="btn btn-primary open-modal" data-url="/backtest/{{ performance.Id }}/luck_test">
+                                <i class="fas fa-play-circle" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    {% endif %}
+            </section>
+        </div>
+    </div>
+    
+    <!-- Correlation test -->
+    <div class="card shadow-sm my-5">
+        <div class="card-body">
+            <section class="mb-5">
+                <h2>Correlation Test</h2>
+                {% if performance.HasCorrelationTest %}
+                    <div id="correlation-test-plot"></div>
+
+                {% else %}
+                    <div class="d-flex justify-content-end mb-3">
+                        <form action="/backtest/{{ performance.Id }}/correlation_test" method="post">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fas fa-play-circle" aria-hidden="true"></i>
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
+
+            </section>
+        </div>
+    </div>
+
+    <div id="modal-container"></div>
+</div>
+<script>
+    // Parse the Plotly JSON passed from FastAPI
+    const plotEquityData = {{ equity_plot | safe }};
+    // Render the chart using Plotly
+    Plotly.newPlot('equity-plot', plotEquityData.data, plotEquityData.layout);
+
+    const luckTestDiv = document.getElementById("luck-test-plot");
+    const plotLTData = {{ luck_test_plot | tojson | safe }};
+    if (luckTestDiv && plotLTData.data.length > 0) {
+        Plotly.newPlot("luck-test-plot", plotLTData.data, plotLTData.layout);
+    }
+
+    const correlationTestDiv = document.getElementById("correlation-test-plot");
+    const plotCTData = {{ correlation_test_plot | tojson | safe }};
+    if (correlationTestDiv && plotCTData.data.length > 0) {
+        Plotly.newPlot("correlation-test-plot", plotCTData.data, plotCTData.layout);
+    }
+
+    const TTestDiv = document.getElementById("t-test-plot");
+    const plotTTData = {{ t_test_plot | tojson | safe }};
+    if (TTestDiv && plotTTData.data.length > 0) {
+        Plotly.newPlot("t-test-plot", plotTTData.data, plotTTData.layout);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        
+        const modalContainer = document.getElementById("modal-container");
+        document.querySelectorAll(".open-modal").forEach(button => {
+            button.addEventListener("click", function () {
+                const url = this.dataset.url; // Ruta al modal externo
+
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error("No se pudo cargar el contenido del modal.");
+                        }
+                        return response.text();
+                    })
+                    .then(html => {
+                        // Inserta el contenido del modal dentro del contenedor
+                        modalContainer.innerHTML = html;
+
+                        // Inicializa y muestra el modal
+                        const modalElement = document.getElementById("botsModal");
+                        const modal = new bootstrap.Modal(modalElement);
+                        modal.show();
+
+                        // Esperar a que el modal se muestre antes de aplicar DataTables
+                        modalElement.addEventListener('shown.bs.modal', function () {
+                            $('#performanceTableModal').DataTable({
+                                paging: true,
+                                searching: true,
+                                ordering: true,
+                                info: true,
+                                pageLength: 50,
+                                lengthMenu: [[20, 50, 100], [10, 50, 100, 'All']]
+                            }); 
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Error:", error);
+                    });
+            });
+        });
+
+    
+        if (localStorage.getItem("scrollPosition")) {
+        window.scrollTo(0, localStorage.getItem("scrollPosition"));
+        }
+
+        // Guardar la posición del scroll antes de que la página se recargue
+        window.addEventListener("beforeunload", function () {
+            localStorage.setItem("scrollPosition", window.scrollY);
+        });
+    
+    });
+
+// Selecciona el botón flotante
+const floatingButton = document.getElementById('floating-favorite-button');
+
+if (floatingButton) {
+    floatingButton.addEventListener('click', async () => {
+        const performanceId = floatingButton.getAttribute('data-performance-id');
+        const endpoint = `/backtest/${performanceId}/favorites`;
+
+        try {
+            // Realizar la solicitud POST al endpoint
+            const response = await fetch(endpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                const isFavorite = data.item;
+
+                // Actualizar dinámicamente el ícono del botón
+                const icon = floatingButton.querySelector('i');
+                if (isFavorite) {
+                    icon.classList.remove('far'); // Estrella vacía
+                    icon.classList.add('fas');   // Estrella llena
+                } else {
+                    icon.classList.remove('fas'); // Estrella llena
+                    icon.classList.add('far');   // Estrella vacía
+                }
+            } else {
+                console.error('Error en la respuesta del servidor:', response.statusText);
+                alert('Hubo un error al actualizar el estado. Por favor, intenta de nuevo.');
+            }
+        } catch (error) {
+            console.error('Error al realizar la solicitud:', error);
+            alert('Hubo un error al comunicarte con el servidor. Por favor, intenta de nuevo.');
+        }
+    });
+}
+
+</script>
+
+{% endblock %}
