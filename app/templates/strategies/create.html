@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}New strategy{% endblock %}
+
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-4">New strategy</h1>
+    <form action="/strategies" method="post" class="w-50 mx-auto p-4 rounded shadow-sm">
+        <!-- Campo de nombre -->
+        <div class="mb-3">
+            <label for="name" class="form-label">Strategy Name:</label>
+            <input type="text" id="name" name="name" class="form-control" required placeholder="Introduce el nombre">
+        </div>
+        <!-- Campo de descripción -->
+        <div class="mb-3">
+            <label for="description" class="form-label">Description:</label>
+            <textarea id="description" name="description" class="form-control" rows="4" required placeholder="Describe brevemente la estrategia"></textarea>
+        </div>
+        <div class="mb-3">
+            <label for="metatrader_name" class="form-label">MetaTrader Name:</label>
+            <input id="MetaTraderName" name="MetaTraderName" class="form-control" required>
+        </div>
+        <!-- Botón de enviar -->
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Create</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,49 @@
+<!-- Modal de Bootstrap -->
+<div class="modal fade" id="botsModal" tabindex="-1" aria-labelledby="botsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="botsModalLabel">Robusts performers</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="max-height: 800px; overflow-y: auto;">
+                <div class="table-responsive">
+                    <table id="performanceTableModal" class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Bot</th>
+                                <th>StabilityRatio</th>
+                                <th>Trades</th>
+                                <th>Return</th>
+                                <th>Drawdown</th>
+                                <th>RreturnDd</th>
+                                <th>StabilityWeightedRar</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for performance in performances %}
+                                <tr>
+                                    <td>
+                                        <a href='/backtest/bot/{{ performance.BotId }}?date_from={{ performance.DateFrom }}&date_to={{ performance.DateTo }}'>
+                                            {{ performance.Bot.Name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ performance.StabilityRatio }}</td>
+                                    <td>{{ performance.Trades }}</td>
+                                    <td>{{ performance.Return }}</td>
+                                    <td>{{ performance.Drawdown }}</td>
+                                    <td>{{ performance.RreturnDd }}</td>
+                                    <td>{{ performance.StabilityWeightedRar }}</td>
+                                    <td>
+                                        <a href='/backtest/ticker/{{ performance.Bot.TickerId }}?strategy_id={{ performance.Bot.StrategyId }}'>Family</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

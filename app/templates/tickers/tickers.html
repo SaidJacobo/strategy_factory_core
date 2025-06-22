@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Tickers{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Tickers</h1>
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>Spread</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticker in tickers %}
+                <tr>
+                    <td>{{ ticker.Name }}</td>
+                    <td>{{ ticker.Spread  }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

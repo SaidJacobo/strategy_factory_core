@@ -1,0 +1,35 @@
+EURNZD:
+- H4
+EURUSD:
+- H1
+- H3
+- H4
+- H6
+GBPJPY:
+- H1
+- H3
+- H4
+GBPUSD:
+- H1
+- H4
+- H6
+META:
+- H1
+- H3
+NVDA:
+- H1
+- H2
+TSLA:
+- H1
+- H2
+US100.cash:
+- H1
+- H2
+- H4
+- H6
+US500.cash:
+- H1
+- H2
+USDJPY:
+- H1
+- H3

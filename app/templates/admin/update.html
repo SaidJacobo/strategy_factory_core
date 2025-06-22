@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}admin{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-4">Admin</h1>
+    <form action="/admin" method="post" class="w-50 mx-auto p-4 rounded shadow-sm">
+        
+        <!-- Card: Initial Cash -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title text-center">Backtest Settings</h5>
+                <div class="mb-3">
+                    <label for="InitialCash" class="form-label">Initial Cash</label>
+                    <input type="number" id="InitialCash" name="InitialCash" class="form-control" min="0" value="{{ configs.InitialCash }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="RiskFreeRate" class="form-label">Risk Free Rate</label>
+                    <input type="number" id="RiskFreeRate" name="RiskFreeRate" class="form-control" min="0" step="0.01" value="{{ configs.RiskFreeRate }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="datefrom" class="form-label">Date From Backtest:</label>
+                    <input type="date" id="DateFromBacktest" name="DateFromBacktest" class="form-control" value="{{ configs.DateFromBacktest }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="dateto" class="form-label">Date To Backtest:</label>
+                    <input type="date" id="DateToBacktest" name="DateToBacktest" class="form-control" value="{{ configs.DateToBacktest }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label> Timeframes </label> <br>
+        
+                    <label for="M1"> M1 </label>
+                    <input type="checkbox" id="M1" name="M1" {% if configs.M1 %}checked{% endif %}>
+        
+                    <label for="M2"> M2 </label>
+                    <input type="checkbox" id="M2" name="M2" {% if configs.M2 %}checked{% endif %}>
+        
+                    <label for="M3"> M3 </label>
+                    <input type="checkbox" id="M3" name="M3" {% if configs.M3 %}checked{% endif %}>
+        
+                    <label for="M4"> M4 </label>
+                    <input type="checkbox" id="M4" name="M4" {% if configs.M4 %}checked{% endif %}>
+        
+                    <label for="M5"> M5 </label>
+                    <input type="checkbox" id="M5" name="M5" {% if configs.M5 %}checked{% endif %}>
+        
+                    <label for="M6"> M6 </label>
+                    <input type="checkbox" id="M6" name="M6" {% if configs.M6 %}checked{% endif %}>
+        
+                    <label for="M10"> M10 </label>
+                    <input type="checkbox" id="M10" name="M10" {% if configs.M10 %}checked{% endif %}>
+        
+                    <label for="M12"> M12 </label>
+                    <input type="checkbox" id="M12" name="M12" {% if configs.M12 %}checked{% endif %}>
+        
+                    <label for="M15"> M15 </label>
+                    <input type="checkbox" id="M15" name="M15" {% if configs.M15 %}checked{% endif %}>
+        
+                    <label for="M20"> M20 </label>
+                    <input type="checkbox" id="M20" name="M20" {% if configs.M20 %}checked{% endif %}>
+        
+                    <label for="M30"> M30 </label>
+                    <input type="checkbox" id="M30" name="M30" {% if configs.M30 %}checked{% endif %}> <br>
+        
+        
+                    <label for="H1"> H1 </label>
+                    <input type="checkbox" id="H1" name="H1" {% if configs.H1 %}checked{% endif %}>
+        
+                    <label for="H2"> H2 </label>
+                    <input type="checkbox" id="H2" name="H2" {% if configs.H2 %}checked{% endif %}>
+        
+                    <label for="H3"> H3 </label>
+                    <input type="checkbox" id="H3" name="H3" {% if configs.H3 %}checked{% endif %}>
+        
+                    <label for="H4"> H4 </label>
+                    <input type="checkbox" id="H4" name="H4" {% if configs.H4 %}checked{% endif %}> 
+        
+                    <label for="H6"> H6 </label>
+                    <input type="checkbox" id="H6" name="H6" {% if configs.H6 %}checked{% endif %}> 
+        
+                    <label for="H8"> H8 </label>
+                    <input type="checkbox" id="H8" name="H8" {% if configs.H8 %}checked{% endif %}> 
+        
+                    <label for="H12"> H12 </label>
+                    <input type="checkbox" id="H12" name="H12" {% if configs.H12 %}checked{% endif %}> <br>
+        
+                    <label for="D1"> D1 </label>
+                    <input type="checkbox" id="D1" name="D1" {% if configs.D1 %}checked{% endif %}> <br>
+        
+                    <label for="W1"> W1 </label>
+                    <input type="checkbox" id="W1" name="W1" {% if configs.W1 %}checked{% endif %}> <br>
+        
+                    <label for="MN1"> MN1 </label>
+                    <input type="checkbox" id="MN1" name="MN1" {% if configs.MN1 %}checked{% endif %}> <br>
+        
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Card: Hit Thresholds -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title text-center">Hit Thresholds</h5>
+                <div class="mb-3">
+                    <label for="PositiveHitThreshold" class="form-label">Positive Hit Threshold (return)</label>
+                    <input type="number" id="PositiveHitThreshold" name="PositiveHitThreshold" class="form-control" min="0" value="{{ configs.PositiveHitThreshold }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="NegativeHitThreshold" class="form-label">Negative Hit Threshold (drawdown)</label>
+                    <input type="number" id="NegativeHitThreshold" name="NegativeHitThreshold" class="form-control" min="0" value="{{ configs.NegativeHitThreshold }}" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card: Hit Thresholds -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title text-center">Default Test Parameters</h5>
+                <div class="mb-3">
+                    <label for="MontecarloIterations" class="form-label">Montecarlo Iterations</label>
+                    <input type="number" id="MontecarloIterations" name="MontecarloIterations" class="form-control" min="1" value="{{ configs.MontecarloIterations }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="MontecarloRiskOfRuin" class="form-label">Montecarlo Risk of Ruin %</label>
+                    <input type="number" id="MontecarloRiskOfRuin" name="MontecarloRiskOfRuin" class="form-control" min="1" value="{{ configs.MontecarloRiskOfRuin }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="RandomTestIterations" class="form-label">Random Test Iterations</label>
+                    <input type="number" id="RandomTestIterations" name="RandomTestIterations" class="form-control" min="1" value="{{ configs.RandomTestIterations }}" required>
+                </div>
+                <div class="mb-3">
+                    <label for="LuckTestPercentTradesToRemove" class="form-label">Luck Test % Trades To Remove</label>
+                    <input type="number" id="LuckTestPercentTradesToRemove" name="LuckTestPercentTradesToRemove" class="form-control" min="1" value="{{ configs.LuckTestPercentTradesToRemove }}" required>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Card: Telegram Settings -->
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title text-center">Telegram Settings</h5>
+                <div class="mb-3">
+                    <label for="TelegramBotToken" class="form-label">Telegram Bot Token</label>
+                    <input type="password" id="TelegramBotToken" name="TelegramBotToken" class="form-control" value="{{ configs.TelegramBotToken }}">
+                </div>
+                <div class="mb-3">
+                    <label for="TelegramBotChatId" class="form-label">Telegram Chat Id</label>
+                    <input type="password" id="TelegramBotChatId" name="TelegramBotChatId" class="form-control" value="{{ configs.TelegramBotChatId }}">
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Update</button>
+        </div>
+    </form>
+</div>
+
+
+
+{% endblock %}

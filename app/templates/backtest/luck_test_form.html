@@ -1,0 +1,22 @@
+<!-- Modal de Bootstrap -->
+<div class="modal fade" id="botsModal" tabindex="-1" aria-labelledby="botsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="botsModalLabel">Luck test parameters</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="/backtest/{{ performance.Id }}/luck_test" method="post" class="w-50 mx-auto p-4 rounded shadow-sm">
+                    <div class="mb-3">
+                        <label for="percent_trades_to_remove" class="form-label">Percent trades to remove:</label>
+                        <input type="number" id="percent_trades_to_remove" name="percent_trades_to_remove" class="form-control" step="1" min="1" value="{{ luck_test_percent_trades_to_remove.Value }}" required>
+                    </div>
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary">Start</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

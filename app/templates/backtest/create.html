@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}Backtest{% endblock %}
+
+{% block content %}
+    <div class="container-fluid row flex-grow-1">
+        <!-- Sección Izquierda: Formulario (80%) -->
+        <div id="form-section" class="col-md-6 d-flex flex-column p-3">
+            <h3>Backtest</h3>
+            <form action="/backtest" id="backtest-form" method="post" class="d-flex flex-column" data-stream-url="/backtest/stream/">
+
+                <div class="mb-3">
+                    <label for="cash" class="form-label">Cash:</label>
+                    <input type="number" id="InitialCash" name="InitialCash" class="form-control" 
+                        min="0" value="{{ model.InitialCash }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="strategy" class="form-label">Strategy:</label>
+                    <select id="StrategyId" name="StrategyId" class="form-select">
+                        <option value="">*</option>
+
+                        {% for strategy in model.Strategies %}
+                            <option value="{{ strategy.Id }}">{{ strategy.Name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <div class="mb-3 d-flex gap-3">
+                    <!-- Select de categorías -->
+                    <div class="w-50">
+                        <label for="category" class="form-label">Category:</label>
+                        <select id="CategoryId" name="CategoryId" class="form-select">
+                            <option value="">*</option>
+                            {% for category in model.Categories %}
+                                <option value="{{ category.Id }}">{{ category.Name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <!-- Select de tickers -->
+                    <div class="w-50"">
+                        <label for="ticker" class="form-label">Ticker:</label>
+                        <select id="TickerId" name="TickerId" class="form-select">
+                            <option value="">*</option>
+                            <!-- Opciones cargadas dinámicamente -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label> Timeframes </label> <br>
+
+                    <label for="M1"> M1 </label>
+                    <input type="checkbox" id="M1" name="M1" {% if model.M1 %}checked{% endif %}>
+
+                    <label for="M2"> M2 </label>
+                    <input type="checkbox" id="M2" name="M2" {% if model.M2 %}checked{% endif %}>
+
+                    <label for="M3"> M3 </label>
+                    <input type="checkbox" id="M3" name="M3" {% if model.M3 %}checked{% endif %}>
+
+                    <label for="M4"> M4 </label>
+                    <input type="checkbox" id="M4" name="M4" {% if model.M4 %}checked{% endif %}>
+
+                    <label for="M5"> M5 </label>
+                    <input type="checkbox" id="M5" name="M5" {% if model.M5 %}checked{% endif %}>
+
+                    <label for="M6"> M6 </label>
+                    <input type="checkbox" id="M6" name="M6" {% if model.M6 %}checked{% endif %}>
+
+                    <label for="M10"> M10 </label>
+                    <input type="checkbox" id="M10" name="M10" {% if model.M10 %}checked{% endif %}>
+
+                    <label for="M12"> M12 </label>
+                    <input type="checkbox" id="M12" name="M12" {% if model.M12 %}checked{% endif %}>
+
+                    <label for="M15"> M15 </label>
+                    <input type="checkbox" id="M15" name="M15" {% if model.M15 %}checked{% endif %}>
+
+                    <label for="M20"> M20 </label>
+                    <input type="checkbox" id="M20" name="M20" {% if model.M20 %}checked{% endif %}>
+
+                    <label for="M30"> M30 </label>
+                    <input type="checkbox" id="M30" name="M30" {% if model.M30 %}checked{% endif %}> <br>
+
+
+                    <label for="H1"> H1 </label>
+                    <input type="checkbox" id="H1" name="H1" {% if model.H1 %}checked{% endif %}>
+
+                    <label for="H2"> H2 </label>
+                    <input type="checkbox" id="H2" name="H2" {% if model.H2 %}checked{% endif %}>
+
+                    <label for="H3"> H3 </label>
+                    <input type="checkbox" id="H3" name="H3" {% if model.H3 %}checked{% endif %}>
+
+                    <label for="H4"> H4 </label>
+                    <input type="checkbox" id="H4" name="H4" {% if model.H4 %}checked{% endif %}> 
+
+                    <label for="H6"> H6 </label>
+                    <input type="checkbox" id="H6" name="H6" {% if model.H6 %}checked{% endif %}> 
+
+                    <label for="H8"> H8 </label>
+                    <input type="checkbox" id="H8" name="H8" {% if model.H8 %}checked{% endif %}> 
+
+                    <label for="H12"> H12 </label>
+                    <input type="checkbox" id="H12" name="H12" {% if model.H12 %}checked{% endif %}> <br>
+
+                    <label for="D1"> D1 </label>
+                    <input type="checkbox" id="D1" name="D1" {% if model.D1 %}checked{% endif %}>
+
+                    <label for="W1"> W1 </label>
+                    <input type="checkbox" id="W1" name="W1" {% if model.W1 %}checked{% endif %}>
+
+                    <label for="MN1"> MN1 </label>
+                    <input type="checkbox" id="MN1" name="MN1" {% if model.MN1 %}checked{% endif %}>
+
+                </div>
+
+                <div class="mb-3 d-flex gap-3">
+                    <!-- Campo de fecha inicial (Date From) -->
+                    <div class="w-50">
+                        <label for="datefrom" class="form-label">Date From:</label>
+                        <input type="date" id="DateFrom" name="DateFrom" class="form-control" value="{{ model.DateFrom }}" required>
+                    </div>
+                
+                    <!-- Campo de fecha final (Date To) -->
+                    <div class="w-50">
+                        <label for="dateto" class="form-label">Date To:</label>
+                        <input type="date" id="DateTo" name="DateTo" class="form-control" value="{{ model.DateTo }}" required>
+                    </div>
+                </div>
+
+                <!-- Campo para el riesgo (Risk) que solo acepta valores numéricos -->
+                <div class="mb-3">
+                    <label for="risk" class="form-label">Risk (%):</label>
+                    <input type="number" id="Risk" name="Risk" class="form-control" 
+                        step="0.00001" min="0" max="100" value="1" required>
+                </div>
+
+                <div class="mb-3">
+                    <input type="checkbox" id="SaveBtPyPlot" name="SaveBtPyPlot">
+                    <label for="save_bt_plot"> save backtesting.py plot </label>
+                </div>
+
+                <!-- Botón de enviar -->
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary">Start</button>
+                </div>
+                <div id="loading-indicator" style="display: none;">
+                    <i class="fa fa-spinner fa-spin"></i> Processing...
+                </div>
+            </form>
+        </div>
+
+        <!-- Sección Derecha: Consola -->
+        <div id="console-section" class="col-md-6 d-flex flex-column p-3">
+            <div id="log-container" class="console-log flex-grow-1"></div>
+        </div>
+</div>
+
+
+<script src="/static/js/console.js"></script>
+<script src="/static/js/categories_tickers.js"></script>
+
+{% endblock %}

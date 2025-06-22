@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Categorias{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Categories</h1>
+    <!-- Tabla de Estrategias -->
+    <div class="table-responsive">
+        <table id="categoriesTable" class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Number of Tickers</th>
+                    <th>Commission</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category in categories %}
+                <tr data-category-id="{{ category.Id }}">
+                    <td>
+                        <a href="/categories/{{ category.Id }}/tickers">{{ category.Name }}</a>
+                    </td>
+                    <td>{{ category.Tickers|length }}</td>
+                    <td>
+                        <input 
+                            type="number" 
+                            name="commission_{{ category.Id }}" 
+                            value="{{ category.Commission }}" 
+                            class="form-control commission-input">
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="d-flex justify-content-end gap-2 mb-3">
+            <form action="/categories/update_tickers" method="post">
+                <button class="btn btn-primary" type="submit">Update Spreads</button>
+            </form>
+        
+            <button id="updateButton" class="btn btn-primary">Update Commissions</button>
+        </div>
+    </div>
+
+
+</div>
+<script>
+    document.getElementById('updateButton').addEventListener('click', async () => {
+        const categories = [];
+        const rows = document.querySelectorAll('#categoriesTable tbody tr');
+        
+        rows.forEach(row => {
+            const categoryId = row.getAttribute('data-category-id');
+            const input = row.querySelector('.commission-input');
+            categories.push({
+                Id: parseInt(categoryId),
+                Commission: parseFloat(input.value) || 0,
+                Name: ''
+            });
+        });
+    
+        const response = await fetch('/categories/update_commissions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(categories)
+        });
+            
+        const result = await response.json(); // 👈 Leemos el JSON que manda FastAPI
+        
+        console.log(result)
+        console.log(result.ok)
+        if (response.ok) {
+            if (result.ok) {
+                alert(result.message || '¡Comisiones actualizadas exitosamente!');
+            } else {
+                alert(result.message || 'Hubo un error en la operación.');
+            }
+        } else {
+            alert('Error de comunicación con el servidor.');
+        }
+    });
+</script>
+{% endblock %}
+

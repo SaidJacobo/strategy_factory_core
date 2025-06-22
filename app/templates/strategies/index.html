@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Strategies{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Strategies</h1>
+
+    <!-- Botón Crear -->
+    <div class="d-flex justify-content-end mb-3">
+        <a href="/strategies/new" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i>
+        </a>
+    </div>
+
+    <!-- Tabla de Estrategias -->
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th></th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for strategy in strategies %}
+                <tr>
+                    <td>{{ strategy.Name }}</td>
+                    <td>{{ strategy.Description }}</td>
+                    <td>
+                        <a href="/strategies/{{ strategy.Id }}/code" >
+                            <i class="fas fa-code"></i>
+                        </a>
+                    </td>
+                    <td>
+                        <a href="/strategies/{{ strategy.Id }}" class="btn btn-warning">
+                            <i class="fas fa-wrench"></i>
+                        </a>
+                    </td>
+                    <td>
+                        <form action="/strategies/{{ strategy.Id }}/delete" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta estrategia?')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

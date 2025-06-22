@@ -1,0 +1,44 @@
+# Archivos generados por Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Entorno virtual
+virtualenv/
+
+# Archivo de configuración para el entorno de desarrollo
+.env
+
+# Archivos de datos
+*.csv
+
+# Archivos de btpy
+app/templates/static/backtest_plots/*.html
+app/templates/static/backtest_plots/reports/*.html
+app/templates/static/correlation_plots/*.html
+app/templates/static/luck_test_plots/*.html
+app/templates/static/t_test_plots/*.html
+backtesting_pipeline/**/*.html
+
+# Archivos de texto
+*.txt
+
+# Archivos de registro y archivos generados por las bibliotecas de registro
+*.log
+
+# Archivos de compilación
+*.pyc
+
+# Carpeta de resultados
+results/
+
+# Carpeta de archivos de caché
+.cache/
+
+# Archivo de configuración para el editor de texto Visual Studio Code
+.vscode/
+*-checkpoint.ipynb
+*.pkl
+
+strategyfactory.db
