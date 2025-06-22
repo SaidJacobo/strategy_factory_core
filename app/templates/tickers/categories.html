@@ -13,7 +13,6 @@
                     <th>Category</th>
                     <th>Number of Tickers</th>
                     <th>Commission</th>
-                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -29,13 +28,6 @@
                             name="commission_{{ category.Id }}" 
                             value="{{ category.Commission }}" 
                             class="form-control commission-input">
-                    </td>
-                    <td>
-                        <select id="commission_type" name="commission_type" class="form-select">
-                            <option value="">$/lot</option>
-                            <option value="">$</option>
-                            <option value="">%</option>
-                        </select>
                     </td>
                 </tr>
                 {% endfor %}
