@@ -48,8 +48,8 @@ Put your strategy to the test with the following methods:
 
 - The core of the application is built on the [Backtesting.py](https://github.com/kernc/backtesting.py) library, but to implement some extra features, a [fork](https://github.com/SaidJacobo/backtesting.py) of the project was made.
 
-## Info
-📺 https://www.youtube.com/@StrategyFactory
+## Tutorial (only in spanish)
+📺 https://youtu.be/NqjJM60plJc
 
 ## Contact
 📧 saidjacobo06@gmail.com

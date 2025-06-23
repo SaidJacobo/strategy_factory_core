@@ -50,8 +50,8 @@ Poné a prueba tu estrategia con estos tests:
 - El core de la aplicacion esta desarrollado sobre la libreria de [Backtesting.py](https://github.com/kernc/backtesting.py)
 , pero para implementar algunas funcionalidades extra se realizó un [fork](https://github.com/SaidJacobo/backtesting.py) del proyecto.
 
-## Info
-📺 https://www.youtube.com/@StrategyFactory
+## Tutorial
+📺 https://youtu.be/NqjJM60plJc
 
 ## Contact
 📧 saidjacobo06@gmail.com
