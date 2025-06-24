@@ -11,16 +11,26 @@
     </div>
     <h2>{{ performance.DateFrom }} to {{ performance.DateTo }} with ${{ performance.InitialCash }}</h2>
     <div id="floating-button-container">
-        <button 
-            id="floating-favorite-button" 
-            class="btn btn-primary btn-circle"
-            data-performance-id="{{ performance.Id }}">
-            {% if performance.Favorite %}
-                <i class="fas fa-star"></i> <!-- Estrella llena -->
-            {% else %}
-                <i class="far fa-star"></i> <!-- Estrella vacía -->
-            {% endif %}
-        </button>
+        <div class="d-flex gap-2">
+            <button 
+                id="floating-favorite-button" 
+                class="btn btn-primary btn-circle"
+                data-performance-id="{{ performance.Id }}">
+                {% if performance.Favorite %}
+                    <i class="fas fa-star"></i> <!-- Estrella llena -->
+                {% else %}
+                    <i class="far fa-star"></i> <!-- Estrella vacía -->
+                {% endif %}
+            </button>
+
+            <button 
+                id="deploy-button" 
+                class="btn btn-primary btn-circle"
+                data-id="{{ performance.Id }}">
+                <i class="fas fa-rocket"></i>
+            </button>
+
+        </div>
     </div>
 
     <!-- Información General -->
@@ -491,6 +501,24 @@
     }
 
     document.addEventListener("DOMContentLoaded", function () {
+
+        // Botón de despliegue
+        document.getElementById("deploy-button").addEventListener("click", async function (e) {
+            e.preventDefault();
+            const performanceId = floatingButton.getAttribute('data-performance-id');
+
+            try {
+                const response = await fetch(`/backtest/${performanceId}/deploy`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                });
+
+                const result = await response.json();
+                alert(result.ok ? "Successful deployment!" : "Error: " + (result.message || "Something is wrong"));
+            } catch (error) {
+                alert("Error en la solicitud: " + error.message);
+            }
+        });
         
         const modalContainer = document.getElementById("modal-container");
         document.querySelectorAll(".open-modal").forEach(button => {

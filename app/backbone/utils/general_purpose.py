@@ -6,6 +6,9 @@ import importlib.util
 import sys
 from functools import wraps
 import contextvars
+from typing import List
+
+from app.backbone.entities.bot_performance import BotPerformance
 
 
 logger = logging.getLogger("general_purpose")
@@ -104,9 +107,11 @@ def streaming_endpoint(func):
                 
     return wrapper
 
-def build_live_trading_config(used_backtests, risk_fn):
+def build_live_trading_config(used_backtests: List[BotPerformance] | BotPerformance, risk_fn):
+    if type(used_backtests) != list:
+        used_backtests = [used_backtests]
+    
     config_file = {}
-
     for bt in used_backtests:
         strategy_name = bt.Bot.Strategy.Name
         ticker_name = bt.Bot.Ticker.Name
