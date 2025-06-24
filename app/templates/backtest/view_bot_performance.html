@@ -514,7 +514,7 @@
                 });
 
                 const result = await response.json();
-                alert(result.ok ? "successful deployment!" : "Error: " + (result.message || "Something is wrong"));
+                alert(result.ok ? "Successful deployment!" : "Error: " + (result.message || "Something is wrong"));
             } catch (error) {
                 alert("Error en la solicitud: " + error.message);
             }
