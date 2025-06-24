@@ -35,9 +35,10 @@ class LiveTrade:
     @property
     def exit_time(self) -> Optional[pd.Timestamp]:
         return pd.Timestamp(self.exit_deal.time, unit='s', tz=self.strategy.timezone) if self.exit_deal else None
-        @property
-        def is_long(self):
-            return self.size > 0
+    
+    @property
+    def is_long(self):
+        return self.size > 0
 
     @property
     def is_short(self):
