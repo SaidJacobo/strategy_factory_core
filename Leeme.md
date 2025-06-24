@@ -1,7 +1,7 @@
 
 # Strategy Factory
 
-**Strategy Factory** es una aplicación web diseñada para que puedas programar y testear tus bots de trading de forma sencilla, ¡todo desde el navegador!
+**Strategy Factory** es una aplicación web diseñada para que puedas programar, testear y desplegar tus bots de trading de forma sencilla, ¡todo desde el navegador!
 <p align="center">
   <img src="./images/home.png" alt="Interfaz" style="width: 60%; max-width: 600px;">
 </p>

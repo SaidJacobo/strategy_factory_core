@@ -9,10 +9,12 @@ from fastapi import Form, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, StreamingResponse
 from fastapi.templating import Jinja2Templates
 from pandas import Timestamp
+import yaml
 from app.backbone.services.bot_service import BotService
 from app.backbone.services.config_service import ConfigService
 from app.backbone.services.strategy_service import StrategyService
 from app.backbone.services.test_service import TestService
+from app.backbone.utils.general_purpose import build_live_trading_config, save_ticker_timeframes
 from app.view_models.backtest_create_vm import BacktestCreateVM
 from app.view_models.performance_metrics_vm import PerformanceMetricsVM
 from app.view_models.bot_performance_vm import BotPerformanceVM
@@ -520,3 +522,35 @@ async def get_backtest_by_ticker(
     except Exception as e:
         print(f"Error: {e}")
         return templates.TemplateResponse("/error.html", {"request": request})
+
+@router.post('/backtest/{performance_id}/deploy')
+async def deploy_portfolio(request: Request, performance_id: int):
+
+    try:
+        backtest = backtest_service.get_bot_performance_by_id(bot_performance_id=performance_id)
+
+        def risk_plain(bt): return bt.Bot.Risk
+
+        config_file = build_live_trading_config(backtest, risk_plain)
+
+        with open("./app/configs/live_trading_auto.yml", "w") as file:
+            yaml.dump(config_file, file, default_flow_style=False, allow_unicode=True)
+
+        ticker_timeframes = save_ticker_timeframes(config_file)
+        
+        with open("./app/configs/metatrader.yml", "w") as file:
+            yaml.dump(
+                ticker_timeframes, 
+                file, 
+                default_flow_style=False, 
+                allow_unicode=True
+            )
+
+        result = OperationResultVM(ok=True, message=None, item=None)
+        return JSONResponse(content=result.model_dump())
+
+    except Exception as e:
+        result = OperationResultVM(ok=False, message=f'There was an error: {e}', item=None)
+        return JSONResponse(content=result.model_dump())
+
+ 
