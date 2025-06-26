@@ -76,7 +76,7 @@ class BacktestService:
             timeframes = [timeframes] if type(timeframes) != list else timeframes
             risks = [risks] if type(risks) != list else risks
   
-            combinations = zip(strategies, tickers, timeframes, risks)
+            combinations = itertools.product(strategies, tickers, timeframes, risks)
 
             async for combination in self.async_iterator(list(combinations)):
                 strategy, ticker, timeframe, risk = combination
