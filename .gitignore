@@ -23,6 +23,8 @@ backtesting_pipeline/**/*.html
 
 # Archivos de texto
 *.txt
+app/configs/live_trading_auto.yml
+app/configs/metatrader.yml
 
 # Archivos de registro y archivos generados por las bibliotecas de registro
 *.log
