@@ -5,12 +5,12 @@ import numpy as np
 import statistics
 
 class TestStrategy(StrategyFactory):  
-    prob_trade = 0.05
+    prob_trade = 0.95
     prob_long = 0.5
     prob_short = 0.5
-    atr_multiplier = 1.5
+    atr_multiplier = 4
     
-    max_bars_in_position = 8
+    max_bars_in_position = 3
     max_consecutive_candles = 4
     factor = 4
     window = 5
@@ -75,6 +75,24 @@ class TestStrategy(StrategyFactory):
                 )
                 
                 self.buy(
+                    size=units,
+                    sl=sl_price
+                )
+
+            elif trade and short:        
+                sl_price = self.data.Close[-1] + self.atr_multiplier * self.atr[-1]
+                
+                pip_distance = self.diff_pips(
+                    price, 
+                    sl_price, 
+                )
+                
+                units = self.calculate_units_size(
+                    price, 
+                    stop_loss_pips=pip_distance, 
+                )
+                
+                self.sell(
                     size=units,
                     sl=sl_price
                 )
