@@ -329,7 +329,7 @@ class StrategyFactory(Strategy):
     def time_in_position(self, trade, max_bars_in_position):
         bars_in_position = len(self.data.index[trade.entry_bar:])
 
-        if bars_in_position > max_bars_in_position and trade.pl > 0:
+        if bars_in_position > max_bars_in_position:
             return True
 
         return False
