@@ -41,6 +41,32 @@ async def log_message(queue: asyncio.Queue, ticker, timeframe, status, message, 
 }))
 
 class BacktestService:
+    """
+    Handles the orchestration, execution, persistence, and retrieval of backtests and related performance metrics.
+
+    This service acts as the central component for running backtests on trading strategies, saving their results,
+    and performing various queries on historical performance data. It supports streaming logs, asynchronous execution,
+    and interaction with the database and configuration layers.
+
+    Main features include:
+    - Running and saving individual or batch backtests across strategy/ticker/timeframe/risk combinations.
+    - Loading strategies dynamically and executing them with proper capital, leverage, and configuration.
+    - Persisting detailed performance metrics and trade history in the database.
+    - Performing deletions and cleanup of historical test data (including files and DB records).
+    - Providing filtering, querying, and tagging of backtests (e.g. by performance, robustness, favorites).
+    - Identifying robust strategies via custom metrics and filters (e.g. return/drawdown ratio > 1).
+    - Managing test dependencies such as Monte Carlo, Luck Test, and Random Test results.
+
+    Attributes:
+        db_service (DbService): Handles database connections and CRUD operations.
+        bot_service (BotService): Manages bot records used during backtesting.
+        config_service (ConfigService): Provides access to configuration values (e.g. risk-free rate).
+
+    Notes:
+        - Backtests can be persisted with reports or run temporarily.
+        - Streaming logs (via queues) allow real-time feedback when executing long-running backtests.
+        - This class assumes a full application context with all entities (Bot, BotPerformance, Trade, etc.) properly defined.
+    """
     def __init__(self):
         self.db_service = DbService()
         self.bot_service = BotService()
@@ -51,6 +77,129 @@ class BacktestService:
         for item in iterable:
             yield item
             await asyncio.sleep(0)
+
+    @streaming_endpoint
+    async def run_backtest(
+        self,
+        initial_cash: float,
+        strategy: Strategy,
+        ticker: Ticker,
+        timeframe: Timeframe,
+        date_from: pd.Timestamp,
+        date_to: pd.Timestamp,
+        method: str,
+        risk: float,
+        save_bt_plot: str,
+        queue: asyncio.Queue,
+        ) -> AsyncGenerator[str, None]:
+        """
+        Executes an asynchronous backtest for a given trading strategy and returns performance metrics, 
+        trade details, and statistics via a streaming endpoint.
+
+        This function loads the specified strategy, fetches historical price data, applies leverage rules,
+        and runs a backtest simulation. Results are streamed in real-time through an asyncio queue, 
+        and optional plots/reports are generated.
+
+        Steps performed:
+        - Loads the trading strategy dynamically from a module path.
+        - Retrieves leverage rules from a YAML config file.
+        - Fetches and prepares historical price data for the given ticker/timeframe.
+        - Computes margin requirements based on leverage.
+        - Executes the backtest using the strategy's logic and calculates performance metrics.
+        - Generates and saves backtest plots (temporary or persistent) if requested.
+        - Streams progress updates, logs, and final results through the provided queue.
+
+        Parameters:
+        - initial_cash (float): Starting capital for the backtest simulation.
+        - strategy (Strategy): Strategy object containing the module path and name.
+        - ticker (Ticker): Financial instrument to backtest on (e.g., currency pair, stock).
+        - timeframe (Timeframe): Timeframe for price data (e.g., '1H', '4H').
+        - date_from (pd.Timestamp): Start date for historical data.
+        - date_to (pd.Timestamp): End date for historical data.
+        - method (str): Reserved for future backtest variations (unused in current implementation).
+        - risk (float): Risk percentage per trade (e.g., 0.01 for 1% risk).
+        - save_bt_plot (str): Plot saving mode: 
+            - 'temp': Saves in a temporary directory (auto-cleaned later).
+            - 'persist': Saves in the main backtest_plots directory.
+            - Any other value skips plot generation.
+        - queue (asyncio.Queue): Async queue for real-time progress streaming.
+
+        Returns:
+        AsyncGenerator[str, None]: Yields three objects upon completion:
+        - performance (pd.DataFrame): Aggregated strategy performance metrics.
+        - trade_performance (pd.DataFrame): Detailed trade-by-trade results.
+        - stats (pd.DataFrame): Statistical summaries (e.g., Sharpe ratio, max drawdown).
+
+        Side effects:
+        - Reads leverage configurations from './app/configs/leverages.yml'.
+        - May create HTML plot files in either './app/templates/static/backtest_plots/temp' (temporary)
+        or './app/templates/static/backtest_plots' (persistent).
+        - Streams logs/results via the provided asyncio.Queue (e.g., for frontend progress updates).
+
+        Notes:
+        - The strategy module path must follow the convention: 'app.backbone.strategies.{strategy_name}'.
+        - Temporary plots include a timestamp and are automatically purged by a separate cleanup process.
+        - Risk-free rate is fetched from the application's config service (used for Sharpe ratio calculations).
+        - Margin is calculated as 1/leverage (e.g., 50x leverage → 2% margin requirement).
+        """
+        await log_message(queue, '', '', "log", f"Loading strategy {strategy.Name}")
+        
+        strategy_name = strategy.Name.split(".")[1]
+        bot_name = f'{strategy_name}_{ticker.Name}_{timeframe.Name}_{risk}'
+        
+        strategy_path = 'app.backbone.strategies.' + strategy.Name
+        strategy_func = load_function(strategy_path)
+        
+        await log_message(queue, '', '', "log", f"Strategy {strategy.Name} loaded succesfully")
+        await log_message(queue, '', '', "log", "Loading leverages")
+
+        with open("./app/configs/leverages.yml", "r") as file_name:
+            leverages = yaml.safe_load(file_name)
+            await log_message(queue, '', '', "log", "Leverages loaded")
+
+        leverage = leverages[ticker.Name]
+        margin = 1 / leverage
+        
+        await log_message(queue, ticker.Name, timeframe.Name, "log", "Getting data")
+
+        prices = get_data(ticker.Name, timeframe.MetaTraderNumber, date_from, date_to)
+        prices.index = pd.to_datetime(prices.index)
+
+        await log_message(queue, ticker.Name, timeframe.Name, "log", f"Data ready: {prices.head(1)}")
+
+        await log_message(queue, ticker.Name, timeframe.Name, "log", "Starting backtest")
+
+        filename = f'{bot_name}_{date_from.strftime("%Y%m%d")}_{date_to.strftime("%Y%m%d")}'
+        plot_path = None
+
+        if save_bt_plot == 'temp':
+            plot_path = './app/templates/static/backtest_plots/temp'
+            await log_message(queue, ticker.Name, timeframe.Name, "link", os.path.join('/backtest_plots/temp', filename + '.html'))
+
+        elif save_bt_plot == 'persist':
+            plot_path = './app/templates/static/backtest_plots'
+
+        risk_free_rate = float(self.config_service.get_by_name('RiskFreeRate').Value)
+
+        performance, trade_performance, stats = run_strategy_and_get_performances(
+            strategy=strategy_func,
+            ticker=ticker,
+            timeframe=timeframe,
+            risk=risk,
+            prices=prices,
+            initial_cash=initial_cash,
+            risk_free_rate=risk_free_rate,
+            margin=margin,
+            plot_path=plot_path,
+            file_name = filename,
+            save_report= save_bt_plot == 'persist' # Solo genera el reporte si no es una corrida temporal
+        )
+
+        await log_message(queue, ticker.Name, timeframe.Name, "log", "The backtest is done :)")
+
+        await log_message(queue, ticker.Name, timeframe.Name, "completed", f"{stats.to_string()}")
+        
+        return performance, trade_performance, stats
 
     @streaming_endpoint
     async def run_backtests_and_save(
@@ -66,7 +215,65 @@ class BacktestService:
         save_bt_plot: str,
         queue: asyncio.Queue,
         ) -> AsyncGenerator[str, None]:
+        """
+        Executes multiple backtests in parallel for all combinations of strategies, tickers, timeframes and risks,
+        then saves results to the database while streaming progress updates.
 
+        This function handles the complete backtesting pipeline:
+        - Generates all possible combinations of input parameters
+        - Checks for existing backtest results to avoid duplicate work
+        - Runs new backtests when needed using run_backtest()
+        - Saves performance metrics, trade details, and statistics to the database
+        - Provides real-time feedback through an async queue
+
+        Steps performed:
+        1. Normalizes all input parameters to lists (single items → single-element lists)
+        2. Generates all combinations of strategies/tickers/timeframes/risks
+        3. For each combination:
+        - Checks if bot exists in database
+        - Verifies if backtest already exists for the date range
+        - Runs new backtest if needed
+        - Converts results to database objects
+        - Saves all data (bot, performance, trades) transactionally
+        4. Streams progress, warnings, and completion messages via queue
+
+        Parameters:
+        - initial_cash (float): Starting capital for all backtests
+        - strategies (Strategy|List[Strategy]): Single strategy or list to test
+        - tickers (Ticker|List[Ticker]): Financial instrument(s) to backtest
+        - timeframes (List[Timeframe]): Time intervals to test (e.g. ['1H', '4H'])
+        - date_from (date): Start date for historical data
+        - date_to (date): End date for historical data
+        - method (str): Backtesting methodology identifier
+        - risks (float|List[float]): Risk percentage(s) per trade (e.g. [0.01, 0.02])
+        - save_bt_plot (str): Plot saving mode:
+            - 'temp': Temporary storage
+            - 'persist': Permanent storage
+            - Other: Skip plot generation
+        - queue (asyncio.Queue): Async queue for progress streaming
+
+        Returns:
+        - AsyncGenerator[str, None]: Yields list of saved BotPerformance objects when complete
+
+        Side effects:
+        - Creates/updates database records for:
+            - Bot configurations
+            - Performance metrics
+            - Individual trades
+        - May generate plot files depending on save_bt_plot parameter
+        - Streams messages to provided queue including:
+            - Progress logs
+            - Warnings about duplicates
+            - Completion/failure notifications
+
+        Notes:
+        - Automatically skips existing backtests for the same parameters/date range
+        - Uses atomic database transactions to ensure data consistency
+        - New bots are created if they don't exist in the database
+        - Trade history is extracted from backtest stats and saved relationally
+        - All database operations use the service's db_service interface
+        - Failures for individual combinations don't stop overall execution
+        """
         try:
             backtests = []
             combinations = None
@@ -177,82 +384,6 @@ class BacktestService:
             
         except Exception as e:
             await log_message(queue, '', '', "failed", f"{str(e)}")
-
-
-    @streaming_endpoint
-    async def run_backtest(
-        self,
-        initial_cash: float,
-        strategy: Strategy,
-        ticker: Ticker,
-        timeframe: Timeframe,
-        date_from: pd.Timestamp,
-        date_to: pd.Timestamp,
-        method: str,
-        risk: float,
-        save_bt_plot: str,
-        queue: asyncio.Queue,
-        ) -> AsyncGenerator[str, None]:
-
-        await log_message(queue, '', '', "log", f"Loading strategy {strategy.Name}")
-        
-        strategy_name = strategy.Name.split(".")[1]
-        bot_name = f'{strategy_name}_{ticker.Name}_{timeframe.Name}_{risk}'
-        
-        strategy_path = 'app.backbone.strategies.' + strategy.Name
-        strategy_func = load_function(strategy_path)
-        
-        await log_message(queue, '', '', "log", f"Strategy {strategy.Name} loaded succesfully")
-        await log_message(queue, '', '', "log", "Loading leverages")
-
-        with open("./app/configs/leverages.yml", "r") as file_name:
-            leverages = yaml.safe_load(file_name)
-            await log_message(queue, '', '', "log", "Leverages loaded")
-
-        leverage = leverages[ticker.Name]
-        margin = 1 / leverage
-        
-        await log_message(queue, ticker.Name, timeframe.Name, "log", "Getting data")
-
-        prices = get_data(ticker.Name, timeframe.MetaTraderNumber, date_from, date_to)
-        prices.index = pd.to_datetime(prices.index)
-
-        await log_message(queue, ticker.Name, timeframe.Name, "log", f"Data ready: {prices.head(1)}")
-
-        await log_message(queue, ticker.Name, timeframe.Name, "log", "Starting backtest")
-
-        filename = f'{bot_name}_{date_from.strftime("%Y%m%d")}_{date_to.strftime("%Y%m%d")}'
-        plot_path = None
-
-        if save_bt_plot == 'temp':
-            plot_path = './app/templates/static/backtest_plots/temp'
-            await log_message(queue, ticker.Name, timeframe.Name, "link", os.path.join('/backtest_plots/temp', filename + '.html'))
-
-        elif save_bt_plot == 'persist':
-            plot_path = './app/templates/static/backtest_plots'
-
-        risk_free_rate = float(self.config_service.get_by_name('RiskFreeRate').Value)
-
-        performance, trade_performance, stats = run_strategy_and_get_performances(
-            strategy=strategy_func,
-            ticker=ticker,
-            timeframe=timeframe,
-            risk=risk,
-            prices=prices,
-            initial_cash=initial_cash,
-            risk_free_rate=risk_free_rate,
-            margin=margin,
-            plot_path=plot_path,
-            file_name = filename,
-            save_report= save_bt_plot == 'persist' # Solo genera el reporte si no es una corrida temporal
-        )
-
-        await log_message(queue, ticker.Name, timeframe.Name, "log", "The backtest is done :)")
-
-        await log_message(queue, ticker.Name, timeframe.Name, "completed", f"{stats.to_string()}")
-        
-        return performance, trade_performance, stats
-
 
     def get_performances_by_strategy_ticker(self, strategy_id, ticker_id) -> BotPerformance:
         with self.db_service.get_database() as db:

@@ -17,95 +17,6 @@ from scipy.stats import binom, jarque_bera, skew, kurtosis
 
 np.seterr(divide="ignore")
 
-def optimization_function(stats):
-    return (
-        (stats["Return [%]"] / (1 + (-1 * stats["Max. Drawdown [%]"])))
-    )
-
-def plot_full_equity_curve(df_equity, title):
-
-    fig = px.line(x=df_equity.index, y=df_equity.Equity)
-    fig.update_layout(title=title, xaxis_title="Date", yaxis_title="Equity")
-    fig.update_traces(textposition="bottom right")
-    fig.show()
-
-def get_scaled_symbol_metadata(ticker: str, metatrader=None):
-
-    if metatrader:
-        info = metatrader.symbol_info(ticker)
-    else:
-        if not mt5.initialize():
-            print("initialize() failed, error code =", mt5.last_error())
-            quit()
-        info = mt5.symbol_info(ticker)
-    contract_volume = info.trade_contract_size
-    minimum_lot = info.volume_min
-    maximum_lot = info.volume_max
-    pip_value = info.trade_tick_size
-    minimum_units = contract_volume * minimum_lot
-    volume_step = info.volume_step
-
-    minimum_fraction = transformar_a_uno(minimum_units)
-
-    scaled_contract_volume = contract_volume / minimum_fraction
-
-    scaled_pip_value = pip_value * minimum_fraction
-    scaled_minimum_lot = minimum_lot / minimum_fraction
-    scaled_maximum_lot = maximum_lot / minimum_fraction
-
-    return (
-        scaled_pip_value,
-        scaled_minimum_lot,
-        scaled_maximum_lot,
-        scaled_contract_volume,
-        minimum_fraction,
-        volume_step
-    )
-
-def get_conversion_rate(prices: pd.DataFrame, ticker: Ticker, timeframe: Timeframe):
-    categories = ['Forex', 'Metals', 'Crypto', 'Exotics'] # <-- Ajustar
-    
-    if ticker.Category.Name in categories:
-        date_from = prices.index[0]
-        date_to = prices.index[-1]
-        
-        if 'USD' not in ticker.Name: # Por ejemplo CHFNZD
-            # En este caso tengo que buscar idealmente NZDUSD 
-            quoted_currency = ticker.Name[3:]
-
-            # Caso ideal
-            asosiated_ticker = quoted_currency + 'USD' # <-- aca deberia ir la divisa de la cuenta
-            usd_prices = get_data(asosiated_ticker, timeframe.MetaTraderNumber, date_from, date_to)
-
-            if usd_prices.empty:
-                asosiated_ticker = 'USD' + quoted_currency
-                usd_prices = get_data(asosiated_ticker, timeframe.MetaTraderNumber, date_from, date_to)
-
-                if usd_prices.empty:
-                    raise Exception("Can't calculate Conversion rate")
-
-                usd_prices['Open'] = 1 / usd_prices['Open']
-
-            usd_prices = usd_prices[['Open']]
-            usd_prices = usd_prices.rename(columns={'Open':'ConversionRate'})
-            usd_prices.index = pd.to_datetime(usd_prices.index)
-
-            prices = pd.merge(
-                left=prices,
-                right=usd_prices,
-                how='left',
-                right_index=True,
-                left_index=True
-            ).ffill()
-            
-        elif ticker.Name.startswith('USD'):
-            prices['ConversionRate'] = 1 / prices['Open']
-    
-    else:
-        prices['ConversionRate'] = 1
-        
-    return prices
-
 def run_strategy(
     strategy,
     ticker: Ticker,
@@ -119,6 +30,59 @@ def run_strategy(
     metatrader_name=None,
     timezone=None,
 ):
+    """
+    Executes a backtest for a trading strategy with proper market metadata and commission handling.
+
+    This function prepares the trading environment by:
+    - Converting prices to the correct denomination
+    - Loading symbol-specific trading constraints
+    - Setting up commission structures
+    - Selecting the appropriate backtest engine (fractional or standard)
+    - Running the strategy with all configured parameters
+
+    Steps performed:
+    1. Converts prices using ticker-specific conversion rates
+    2. Retrieves scaled symbol metadata (lot sizes, pip values, etc.)
+    3. Configures commission calculation based on ticker category:
+        - Absolute commission per contract for >=1
+        - Percentage commission for <1
+    4. Initializes either:
+        - FractionalBacktest for fractional lot sizes
+        - Standard Backtest for whole lot sizes
+    5. Executes the strategy with all parameters and constraints
+    6. Returns performance statistics and the backtest engine instance
+
+    Parameters:
+    - strategy: Trading strategy class/function to backtest
+    - ticker (Ticker): Financial instrument being traded
+    - timeframe (Timeframe): Time interval for the backtest
+    - prices (pd.DataFrame): OHLC price data
+    - initial_cash (float): Starting capital
+    - margin (float): Margin requirement (1/leverage)
+    - risk_free_rate (float, optional): Risk-free rate for Sharpe ratio. Defaults to 0.
+    - risk (float, optional): Risk percentage per trade. Defaults to None.
+    - opt_params (dict, optional): Optimization parameters. Defaults to None.
+    - metatrader_name (str, optional): MT5 symbol name. Defaults to None.
+    - timezone (str, optional): Timezone for trade timestamps. Defaults to None.
+
+    Returns:
+    - tuple: Contains:
+        - stats: Backtest performance statistics (pd.Series/dict)
+        - bt_train: The backtest engine instance (for further analysis)
+
+    Side effects:
+    - Makes MT5 API call to get symbol info (via mt5.symbol_info)
+    - Modifies the input prices DataFrame with conversion rates
+    - May log warnings about lot size rounding in backtest engine
+
+    Notes:
+    - Commission is applied both on entry and exit (hence /2 in calculation)
+    - Fractional backtesting is automatically used when minimum_fraction < 1
+    - All trading constraints (lot sizes, steps) come from broker metadata
+    - The backtest engine handles spread as a fixed value from ticker.Spread
+    - Returned stats typically include Sharpe ratio, drawdown, trade counts etc.
+    - The bt_train object can be used to access trade-by-trade details
+    """
 
     prices = get_conversion_rate(prices, ticker, timeframe)
     
@@ -191,6 +155,71 @@ def run_strategy_and_get_performances(
     opt_params=None,
     save_report=False
 ):
+    
+    """
+    Executes a trading strategy backtest and computes comprehensive performance metrics,
+    with optional visualization and reporting capabilities.
+
+    This function extends the basic backtest by:
+    - Generating detailed performance statistics
+    - Calculating advanced metrics (stability ratio, Jarque-Bera, etc.)
+    - Producing visualizations and HTML reports
+    - Segmenting trade analytics (long/short, winning/losing trades)
+    - Computing risk-adjusted return metrics
+
+    Steps performed:
+    1. Runs the core strategy backtest using run_strategy()
+    2. Generates equity curve plots if plot_path is specified
+    3. Creates QuantStats performance reports if save_report=True
+    4. Computes trade-level metrics:
+        - Percentage returns relative to account equity
+        - Trade durations in days
+        - Win/loss segmentation
+    5. Calculates advanced statistics:
+        - Equity curve stability ratio (linear regression R²)
+        - Winrate binomial p-value
+        - Return distribution metrics (skew, kurtosis)
+    6. Compiles results into three structured DataFrames:
+        - Strategy-level performance metrics
+        - Detailed trade performance analytics
+        - Raw backtest statistics
+
+    Parameters:
+    - strategy: Trading strategy implementation
+    - ticker (Ticker): Financial instrument configuration
+    - timeframe (Timeframe): Backtesting time interval
+    - prices (pd.DataFrame): OHLC price data
+    - initial_cash (float): Starting capital
+    - risk_free_rate (float): Risk-free rate for Sharpe ratio
+    - margin (float): Margin requirement (1/leverage)
+    - risk (float, optional): Risk percentage per trade. Default=None.
+    - plot_path (str, optional): Directory to save plots. Default=None.
+    - file_name (str, optional): Base name for output files. Default=None.
+    - opt_params (dict, optional): Optimization parameters. Default=None.
+    - save_report (bool, optional): Whether to save QuantStats report. Default=False.
+
+    Returns:
+    - tuple: Three DataFrames containing:
+        - df_stats (pd.DataFrame): Strategy performance metrics (1 row)
+        - trade_performance (pd.DataFrame): Aggregated trade analytics (1 row)
+        - stats: Raw backtest statistics object
+
+    Side effects:
+    - Creates plot files in plot_path if specified:
+        - Interactive equity curve plot (.html)
+        - QuantStats performance report (if save_report=True)
+    - May create directories if they don't exist
+
+    Notes:
+    - Trade returns are calculated as percentage of equity at entry
+    - Duration is converted to whole days for consistency
+    - Stability ratio measures equity curve linearity (higher = smoother)
+    - Winrate p-value tests if winrate could occur by chance
+    - Jarque-Bera tests return distribution normality
+    - All metrics are rounded to 3 decimal places
+    - Missing values are filled with 0 for robustness
+    - Separate metrics are provided for long/short positions
+    """
     
     stats, bt_train = run_strategy(
         strategy=strategy,
@@ -348,6 +377,138 @@ def run_strategy_and_get_performances(
 
     return df_stats, trade_performance.round(3), stats
 
+def get_conversion_rate(prices: pd.DataFrame, ticker: Ticker, timeframe: Timeframe):
+    """
+    Calculates and applies currency conversion rates to price data for non-USD denominated instruments.
+
+    This function handles currency conversion for Forex, Metals, Crypto, and Exotics by:
+    - Identifying if the instrument needs conversion (non-USD or inverse USD pairs)
+    - Finding the appropriate USD-based counterpart pair
+    - Applying direct or inverse rates as needed
+    - Merging conversion rates with the original price data
+
+    Steps performed:
+    1. Checks if the ticker category requires conversion (Forex, Metals, Crypto, Exotics)
+    2. For non-USD pairs (e.g., EURGBP):
+       - Attempts to find the USD-quoted version (GBPUSD)
+       - Falls back to inverse pair (USDGBP) if direct not available
+       - Calculates inverse rates when needed
+    3. For USD-prefixed pairs (e.g., USDJPY):
+       - Applies direct inverse (1/USDJPY)
+    4. For non-convertible categories:
+       - Sets conversion rate to 1 (no conversion)
+    5. Merges conversion rates with original prices via forward-fill
+
+    Parameters:
+    - prices (pd.DataFrame): OHLC price data with DateTime index
+    - ticker (Ticker): Instrument information including:
+        - Name (e.g., 'EURGBP', 'USDJPY')
+        - Category (determines if conversion needed)
+    - timeframe (Timeframe): Used to fetch conversion rates at matching intervals
+
+    Returns:
+    - pd.DataFrame: Original prices with added 'ConversionRate' column:
+        - 1.0 for non-convertible instruments
+        - Direct rate for USD-prefixed pairs
+        - Cross-calculated rate for other Forex pairs
+
+    Raises:
+    - Exception: When no valid conversion pair can be found for a non-USD instrument
+
+    Notes:
+    - Conversion rates are forward-filled to handle mismatched timestamps
+    - Always targets USD conversion (assumes USD is account currency)
+    - For pairs like EURGBP, conversion goes through GBPUSD first
+    - Metals (XAUUSD) and Crypto (BTCUSD) follow same logic as Forex
+    - The function preserves all original price columns
+    """
+    categories = ['Forex', 'Metals', 'Crypto', 'Exotics'] # <-- Ajustar
+    
+    if ticker.Category.Name in categories:
+        date_from = prices.index[0]
+        date_to = prices.index[-1]
+        
+        if 'USD' not in ticker.Name: # Por ejemplo CHFNZD
+            # En este caso tengo que buscar idealmente NZDUSD 
+            quoted_currency = ticker.Name[3:]
+
+            # Caso ideal
+            asosiated_ticker = quoted_currency + 'USD' # <-- aca deberia ir la divisa de la cuenta
+            usd_prices = get_data(asosiated_ticker, timeframe.MetaTraderNumber, date_from, date_to)
+
+            if usd_prices.empty:
+                asosiated_ticker = 'USD' + quoted_currency
+                usd_prices = get_data(asosiated_ticker, timeframe.MetaTraderNumber, date_from, date_to)
+
+                if usd_prices.empty:
+                    raise Exception("Can't calculate Conversion rate")
+
+                usd_prices['Open'] = 1 / usd_prices['Open']
+
+            usd_prices = usd_prices[['Open']]
+            usd_prices = usd_prices.rename(columns={'Open':'ConversionRate'})
+            usd_prices.index = pd.to_datetime(usd_prices.index)
+
+            prices = pd.merge(
+                left=prices,
+                right=usd_prices,
+                how='left',
+                right_index=True,
+                left_index=True
+            ).ffill()
+            
+        elif ticker.Name.startswith('USD'):
+            prices['ConversionRate'] = 1 / prices['Open']
+    
+    else:
+        prices['ConversionRate'] = 1
+        
+    return prices
+
+def optimization_function(stats):
+    return (
+        (stats["Return [%]"] / (1 + (-1 * stats["Max. Drawdown [%]"])))
+    )
+
+def plot_full_equity_curve(df_equity, title):
+
+    fig = px.line(x=df_equity.index, y=df_equity.Equity)
+    fig.update_layout(title=title, xaxis_title="Date", yaxis_title="Equity")
+    fig.update_traces(textposition="bottom right")
+    fig.show()
+
+def get_scaled_symbol_metadata(ticker: str, metatrader=None):
+
+    if metatrader:
+        info = metatrader.symbol_info(ticker)
+    else:
+        if not mt5.initialize():
+            print("initialize() failed, error code =", mt5.last_error())
+            quit()
+        info = mt5.symbol_info(ticker)
+    contract_volume = info.trade_contract_size
+    minimum_lot = info.volume_min
+    maximum_lot = info.volume_max
+    pip_value = info.trade_tick_size
+    minimum_units = contract_volume * minimum_lot
+    volume_step = info.volume_step
+
+    minimum_fraction = transformar_a_uno(minimum_units)
+
+    scaled_contract_volume = contract_volume / minimum_fraction
+
+    scaled_pip_value = pip_value * minimum_fraction
+    scaled_minimum_lot = minimum_lot / minimum_fraction
+    scaled_maximum_lot = maximum_lot / minimum_fraction
+
+    return (
+        scaled_pip_value,
+        scaled_minimum_lot,
+        scaled_maximum_lot,
+        scaled_contract_volume,
+        minimum_fraction,
+        volume_step
+    )
 
 def calculate_binomial_p_value(n, k, p=0.5):
     """
