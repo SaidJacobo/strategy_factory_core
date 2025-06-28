@@ -25,13 +25,64 @@ import plotly.graph_objects as go
 
 
 class TestService:
+    """
+    Provides a collection of statistical and robustness tests for evaluating trading bot performance.
+
+    This service encapsulates methods that assess the quality, reliability, and randomness of 
+    a strategy's results by applying various statistical analyses such as:
+    - t-tests for Sharpe ratio significance
+    - correlation tests between bot returns and the underlying asset
+    - randomization tests against synthetic strategies
+    - luck-based filtering of extreme trades
+    - Monte Carlo simulations to evaluate ruin probabilities
+
+    Attributes:
+        db_service (DbService): Handles database interactions and persistence.
+        backtest_service (BacktestService): Retrieves historical bot performance and trade data.
+        config_service (ConfigService): Provides access to application-wide configuration values (e.g., risk-free rate).
     
+    Notes:
+        - This class is intended to be used as a backend utility for validating trading bot robustness.
+        - Each test method typically returns an `OperationResult` and may generate visualizations or database entries.
+    """
     def __init__(self):
         self.db_service = DbService()
         self.backtest_service = BacktestService()
         self.config_service = ConfigService()
         
-    def run_montecarlo_test(self, bot_performance_id, n_simulations, threshold_ruin) -> OperationResult:
+    def run_montecarlo_test(self, bot_performance_id:int, n_simulations:int, threshold_ruin:float) -> OperationResult:
+        """
+        Performs a Monte Carlo simulation to assess the probabilistic risk profile of a bot's equity curve.
+
+        This test runs multiple randomized simulations of the bot’s historical trade sequence to estimate 
+        the potential distribution of future outcomes. It focuses on downside risk by evaluating the 
+        likelihood of reaching a "ruin" threshold and analyzing performance percentiles.
+
+        Steps performed:
+        - Loads the bot's historical trade and equity data.
+        - Runs `n_simulations` Monte Carlo paths using the historical trade returns.
+        - Calculates key percentile statistics (e.g., 5th, 10th, median, 90th, 95th) over all simulations.
+        - Evaluates whether the equity would fall below the specified `threshold_ruin`.
+        - Stores the test metadata and resulting metrics in the database.
+
+        Parameters:
+            bot_performance_id (int): The ID of the bot performance record to analyze.
+            n_simulations (int): Number of Monte Carlo simulations to run.
+            threshold_ruin (float): Capital threshold considered as "ruin" (e.g., 0.3 = 30% of initial capital).
+
+        Returns:
+            OperationResult: Indicates success and contains a list of `MetricWharehouse` entries 
+            with computed statistics.
+
+        Side effects:
+            - Saves a `MontecarloTest` entity in the database linked to the given performance.
+            - Stores all percentile results and associated metadata in the `MetricWharehouse` table.
+
+        Notes:
+            - This test provides a probabilistic view of strategy robustness under randomness and path dependency.
+            - Useful for risk management, especially when assessing worst-case scenarios or capital preservation.
+            - The simulation respects the statistical properties of the original trade distribution (returns and durations).
+        """
         performance = self.backtest_service.get_bot_performance_by_id(bot_performance_id=bot_performance_id)
         trades_history = get_trade_df_from_db(performance.TradeHistory, performance_id=performance.Id)
 
@@ -74,27 +125,42 @@ class TestService:
             self.db_service.create_all(db, rows)
         
         return OperationResult(ok=True, message=None, item=rows)
-        
-    def get_luck_test_equity_curve(self, bot_performance_id, remove_only_good_luck=False) -> OperationResult:
-        ''' filtra los mejores y peores trades de un bt y devuelve una nueva curva de equity'''
-        performance = self.backtest_service.get_bot_performance_by_id(bot_performance_id=bot_performance_id)
-        trades = get_trade_df_from_db(performance.TradeHistory, performance_id=performance.Id)
-        
-        if remove_only_good_luck:
-            filtered_trades = trades[(trades['TopBest'].isna())].sort_values(by='ExitTime')
-        
-        else:
-            filtered_trades = trades[(trades['TopBest'].isna()) & (trades['TopWorst'].isna())].sort_values(by='ExitTime')
-        
-        filtered_trades['Equity'] = 0
-        filtered_trades.ReturnPct = filtered_trades.ReturnPct / 100
-        filtered_trades['Equity'] = (performance.InitialCash * (1 + filtered_trades.ReturnPct).cumprod()).round(3)
-        equity = filtered_trades[['ExitTime','Equity']]
-        
-        return OperationResult(ok=True, message=None, item=equity)
-        
+               
     def run_luck_test(self, bot_performance_id, trades_percent_to_remove) -> OperationResult:
-        
+        """
+        Performs a "luck test" to evaluate the robustness of a bot's performance by removing extreme trades.
+
+        This method simulates the impact of luck by discarding a percentage of the bot's best and worst trades,
+        then recalculating performance metrics based on the remaining data. The goal is to estimate how much
+        of the bot's performance depends on a few outliers.
+
+        Steps performed:
+        - Loads the bot's trade history and determines how many trades to remove based on the given percentage.
+        - Identifies the top `X%` best and worst trades by return percentage.
+        - Filters out these trades and rebuilds the equity curve from the remaining ones.
+        - Calculates new performance metrics: return, drawdown, return/drawdown ratio, winrate, and a custom metric.
+        - Fits a linear regression to the equity curve to compute a stability ratio.
+        - Creates a new `BotPerformance` object based on the filtered trades.
+        - Stores all results, including which trades were marked as "lucky" (best or worst), in the database.
+        - Triggers the generation of a Plotly chart to visualize the filtered performance.
+
+        Parameters:
+            bot_performance_id (int): The ID of the bot performance record to analyze.
+            trades_percent_to_remove (float): Percentage of top and bottom trades (by return) to remove for the test.
+
+        Returns:
+            OperationResult: An object indicating success and containing the resulting `LuckTest` record.
+
+        Side effects:
+            - Updates the trade records in the database to flag trades as top-best or top-worst.
+            - Saves a new `LuckTest` and `BotPerformance` entry reflecting the filtered results.
+            - Generates and stores a visualization of the adjusted performance.
+
+        Notes:
+            - This test helps detect whether a bot's profitability is overly dependent on a few outlier trades.
+            - The stability ratio is derived from the R² of a linear regression on the filtered equity curve.
+            - The custom metric is a weighted risk-adjusted return penalized by drawdown and enhanced by stability.
+        """
         performance = self.backtest_service.get_bot_performance_by_id(bot_performance_id=bot_performance_id)
         trades = get_trade_df_from_db(performance.TradeHistory, performance_id=performance.Id)
         trades_to_remove = round((trades_percent_to_remove/100) * trades.shape[0])
@@ -175,7 +241,69 @@ class TestService:
     
         return OperationResult(ok=True, message=None, item=luck_test_db)
 
+    def get_luck_test_equity_curve(self, bot_performance_id, remove_only_good_luck=False) -> OperationResult:
+        """
+        Generates a filtered equity curve by removing lucky trades from a bot's historical performance.
+
+        This method rebuilds the bot's equity curve after excluding trades flagged as either top-performing 
+        ("TopBest"), worst-performing ("TopWorst"), or both, depending on the configuration.
+
+        Parameters:
+            bot_performance_id (int): The ID of the bot performance record to analyze.
+            remove_only_good_luck (bool): If True, only the top-performing trades ("TopBest") are removed.
+                                        If False, both "TopBest" and "TopWorst" trades are removed.
+
+        Returns:
+            OperationResult: Contains the filtered equity curve as a DataFrame with `ExitTime` and `Equity`.
+
+        Notes:
+            - This function is typically used to assess the strategy's robustness by simulating less favorable luck.
+            - Equity is recomputed using cumulative product of filtered returns.
+        """
+        performance = self.backtest_service.get_bot_performance_by_id(bot_performance_id=bot_performance_id)
+        trades = get_trade_df_from_db(performance.TradeHistory, performance_id=performance.Id)
+        
+        if remove_only_good_luck:
+            filtered_trades = trades[(trades['TopBest'].isna())].sort_values(by='ExitTime')
+        
+        else:
+            filtered_trades = trades[(trades['TopBest'].isna()) & (trades['TopWorst'].isna())].sort_values(by='ExitTime')
+        
+        filtered_trades['Equity'] = 0
+        filtered_trades.ReturnPct = filtered_trades.ReturnPct / 100
+        filtered_trades['Equity'] = (performance.InitialCash * (1 + filtered_trades.ReturnPct).cumprod()).round(3)
+        equity = filtered_trades[['ExitTime','Equity']]
+        
+        return OperationResult(ok=True, message=None, item=equity)
+
     def _create_luck_test_plot(self, bot_performance_id) -> OperationResult:
+        """
+        Generates and saves a Plotly chart comparing the original and "luck test" equity curves.
+
+        This function plots three equity curves:
+        - The original equity curve with all trades.
+        - The equity curve after removing both top and bottom trades (luck-neutral).
+        - The equity curve after removing only top-performing trades (bad-luck only).
+
+        Steps performed:
+        - Retrieves original and filtered trade histories.
+        - Computes equity for each curve.
+        - Plots them using Plotly and exports the figure as a JSON file.
+
+        Parameters:
+            bot_performance_id (int): The ID of the bot performance record to visualize.
+
+        Returns:
+            OperationResult: Indicates success or failure. The chart is saved as a JSON file for rendering.
+
+        Side effects:
+            - Saves the chart to `./app/templates/static/luck_test_plots` with a filename
+            based on the bot's name and performance date range.
+
+        Notes:
+            - Helps visualize how the strategy performs with or without "lucky" trades.
+            - This is a private helper method not intended to be used directly.
+        """
         bot_performance = self.backtest_service.get_bot_performance_by_id(bot_performance_id=bot_performance_id)
         bot_performance.TradeHistory = sorted(bot_performance.TradeHistory, key=lambda trade: trade.ExitTime)
 
@@ -231,6 +359,40 @@ class TestService:
             f.write(json_content)
             
     def run_random_test(self, bot_performance_id, n_iterations) -> OperationResult:
+        """
+        Performs a Monte Carlo randomization test to evaluate the statistical significance of a bot's performance.
+
+        This method compares the real bot's performance metrics to those obtained from multiple randomized simulations
+        that mimic the bot's trade frequency, duration, and direction probabilities. The goal is to assess whether 
+        the bot’s performance could have occurred by chance.
+
+        Steps performed:
+        - Loads bot performance data, price history, and equity curve.
+        - Extracts empirical trading behavior (probabilities, duration statistics).
+        - Runs a set of randomized backtests using a custom "RandomTrader" strategy to simulate noise-based trades.
+        - Bootstraps real and random returns `n_iterations` times and computes key performance metrics.
+        - For each metric (return, drawdown, return/DD, winrate), calculates:
+            - Mean and standard deviation differences
+            - Z-scores
+            - One-sided p-values (probability that the real strategy performs worse or equal to the random one).
+        - Stores the statistical results in the database.
+
+        Parameters:
+            bot_performance_id (int): The ID of the bot performance record to analyze.
+            n_iterations (int): Number of bootstrap iterations to compare real vs. random performance.
+
+        Returns:
+            OperationResult: An object indicating success. Results are saved to the database.
+
+        Side effects:
+            - Runs multiple randomized backtests using the bot's historical market data.
+            - Saves statistical results in a `RandomTest` table (via `self.db_service`).
+
+        Notes:
+            - This test evaluates whether the strategy adds value beyond what could be expected by random chance.
+            - Performance metrics compared: total return, max drawdown, return-to-drawdown ratio, and winrate.
+            - Assumes the presence of a random strategy class at `'app.backbone.strategies.random_trader.RandomTrader'`.
+        """
         bot_performance = self.backtest_service.get_bot_performance_by_id(bot_performance_id=bot_performance_id)
         ticker = bot_performance.Bot.Ticker
         timeframe = bot_performance.Bot.Timeframe
@@ -385,8 +547,41 @@ class TestService:
             
         return OperationResult(ok=True, message=None, item=None)
 
-    def run_correlation_test(self, bot_performance_id) -> OperationResult:
-        
+    def run_correlation_test(self, bot_performance_id: int) -> OperationResult:
+        """
+        Performs a correlation analysis between a bot's monthly returns and the underlying asset's price variation.
+
+        This method calculates the monthly percentage changes in the bot's equity curve and compares them to
+        the monthly price changes of the underlying instrument. It evaluates both the Pearson correlation 
+        coefficient and the coefficient of determination (R²) via linear regression.
+
+        Steps performed:
+        - Retrieves the bot's equity curve and historical price data for the configured ticker and timeframe.
+        - Aggregates both series to monthly frequency and computes percentage variations.
+        - Aligns and fills missing months to ensure matching time indices.
+        - Fits a linear regression model between asset price changes and bot returns.
+        - Computes Pearson's correlation coefficient and R² score.
+        - Generates a Plotly scatter plot with a fitted regression line.
+        - Annotates the plot with the correlation and determination values.
+        - Saves the plot as a JSON file for rendering.
+
+        Parameters:
+            bot_performance_id (int): The ID of the bot performance record to analyze.
+
+        Returns:
+            OperationResult: An object indicating success and containing a DataFrame with:
+                - `correlation`: Pearson correlation coefficient (r)
+                - `determination`: Coefficient of determination (R²)
+
+        Side effects:
+            Saves a Plotly chart as an HTML-ready JSON file in the `./app/templates/static/correlation_plots` directory.
+            The filename includes the bot's name and performance date range.
+
+        Notes:
+            - This analysis helps identify the degree to which the bot's performance is correlated with the underlying asset.
+            - Monthly data is used to smooth out noise and capture general trends.
+        """
+
         bot_performance = self.backtest_service.get_bot_performance_by_id(bot_performance_id=bot_performance_id)
         
         trade_history = get_trade_df_from_db(
@@ -488,11 +683,38 @@ class TestService:
         
         return OperationResult(ok=True, message=False, item=result)
     
-    def run_t_test(self, bot_performance_id):
+    def run_t_test(self, bot_performance_id: int):
         """
-        equity: DataFrame con columnas ['ExitTime', 'Equity']
+        Performs a rolling Sharpe Ratio analysis with confidence intervals for a given bot's performance.
+
+        This method calculates the monthly returns of the bot based on its equity curve and evaluates
+        the statistical stability of its risk-adjusted performance over time.
+
+        Steps performed:
+        - Extracts the bot's equity history and computes monthly returns.
+        - Tests for normality using the Shapiro-Wilk test.
+        - Computes the cumulative Sharpe Ratio month-by-month.
+        - Builds 95% confidence intervals using either:
+            - Bootstrapping (if returns are not normally distributed), or
+            - Theoretical t-distribution (if returns are normal).
+        - Renders an interactive Plotly chart with the Sharpe Ratio curve and confidence bands.
+        - Annotates the Shapiro-Wilk p-value and saves the chart as a JSON file.
+
+        Parameters:
+            bot_performance_id (int): The ID of the bot performance record to analyze.
+
+        Returns:
+            OperationResult: A success indicator and optional message or payload.
+        
+        Side effects:
+            Saves a Plotly chart as an HTML-ready JSON file in the `./app/templates/static/t_test_plots` directory.
+            The filename includes the bot's name and performance date range.
+
+        Notes:
+            - The risk-free rate is retrieved from the configuration under the key "RiskFreeRate".
+            - The Sharpe Ratio is annualized assuming 12 periods (monthly data).
+            - The analysis starts from the second available month (since returns require two data points).
         """
-        # Función para calcular el Sharpe Ratio anualizado
         risk_free_rate = float(self.config_service.get_by_name('RiskFreeRate').Value)
         
         def bootstrap_sharpe_ci_cumulative(returns, n_bootstrap=1000, confidence=0.95):
