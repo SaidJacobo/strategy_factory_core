@@ -59,5 +59,50 @@ Put your bot to run in real time!
 ## Tutorial (only in spanish)
 📺 https://www.youtube.com/playlist?list=PLIS81qU4XbMc8n5pinieZsrb4K4hhutjw
 
+## 🤝 Contributing
+
+Contributions are welcome and greatly appreciated! 🎉 Whether you want to report a bug, request a new feature, improve the documentation, or submit code improvements — you are more than welcome.
+
+### How to Contribute
+
+1. **Fork this repository** — Click the `Fork` button at the top right.
+2. **Clone your fork**
+```bash
+git clone https://github.com/your-username/strategy_factory.git
+```
+3. **Create a new branch**
+```bash
+git checkout -b feature/your-feature-name
+```
+4. **Make your changes**  
+Implement bug fixes, new features, or improvements.
+5. **Commit your changes**
+```bash
+git commit -m "Add: description of your change"
+```
+6. **Push to your fork**
+```bash
+git push origin feature/your-feature-name
+```
+7. **Open a Pull Request** — Go to the repository and click `New pull request`.
+
+### Guidelines
+
+- Follow the existing code style and structure.
+- Write clear and descriptive commit messages.
+- If possible, include tests for your changes.
+- Document any new features or behaviors.
+
+### Discussions and Issues
+
+If you're not sure where to start, check the [Issues](https://github.com/SaidJacobo/strategy_factory_core/issues) tab for open bugs or feature requests. You can also start a discussion if you have ideas or questions.
+
+---
+
+## ⭐ Support the Project
+
+If you find this project useful, consider giving it a ⭐ star on GitHub — it really helps!
+
+
 ## Contact
 📧 saidjacobo06@gmail.com
