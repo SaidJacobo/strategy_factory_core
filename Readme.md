@@ -29,6 +29,11 @@ Put your strategy to the test with the following methods:
 
 ![Demo GIF](images/bot_tests.gif)
 
+### 🚀 Deploy your bot
+Put your bot to run in real time!
+
+![Demo GIF](images/deploy_bot.gif)
+
 ## ⚙️ Installation
 
 ### Requirements

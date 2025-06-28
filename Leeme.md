@@ -30,6 +30,11 @@ Poné a prueba tu estrategia con estos tests:
 
 ![Demo GIF](images/bot_tests.gif)
 
+### 🚀 Desplega tu bot
+Pone tu bot a correr en tiempo real!
+
+![Demo GIF](images/deploy_bot.gif)
+
 ## ⚙️ Instalación
 
 ### Requisitos
