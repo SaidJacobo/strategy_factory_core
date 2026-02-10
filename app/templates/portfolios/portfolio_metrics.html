@@ -1,0 +1,90 @@
+{% if metrics is none %}
+    <div style="display: flex; justify-content: center; align-items: center; height: 50vh; text-align: center;">
+        <p style="font-size: 1.5rem;">There are no metrics for this portfolio</p>
+    </div>
+{% else %}
+    <div class="table-responsive">
+        <table id="metricsTable" class="table table-custom">
+            <thead>
+                <tr>
+                    <th>SharpeRatio</th>
+                    <th>StabilityRatio</th>
+                    <th>Return</th>
+                    <th>Drawdown</th>
+                    <th>RreturnDd</th>
+                    <th>MeanReturns</th>
+                    <th>StdReturns</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ metrics.SharpeRatio }}</td>
+                    <td>{{ metrics.StabilityRatio }}</td>
+                    <td>{{ metrics.Return }}</td>
+                    <td>{{ metrics.Drawdown }}</td>
+                    <td>{{ metrics.RreturnDd }}</td>
+                    <td>{{ metrics.MeanReturns }}</td>
+                    <td>{{ metrics.StdReturns }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <table id="metricsTable" class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Jarque Bera</th>
+                    <th>Jarque Bera p-value</th>
+                    <th>Skew</th>
+                    <th>Kurtosis</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ metrics.JarqueBeraStat }}</td>
+                    <td>{{ metrics.JarqueBeraPValue }}</td>
+                    <td>{{ metrics.Skew }}</td>
+                    <td>{{ metrics.Kurtosis }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="table-responsive">
+        <table id="challengeTable" class="table table-custom">
+            <thead>
+                <tr>
+                    <th>PositiveHits</th>
+                    <th>NegativeHits</th>
+                    <th>SuccessRatio</th>
+                    <th>MeanTimeToPositive</th>
+                    <th>StdTimeToPositive</th>
+                    <th>MeanTimeToNegative</th>
+                    <th>StdTimeToNegative</th>
+                    <th>MarginCalls</th>
+                    <th>StopOuts</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ metrics.PositiveHits }}</td>
+                    <td>{{ metrics.NegativeHits }}</td>
+                    <td>{{ metrics.SuccessRatio }}</td>
+                    <td>{{ metrics.MeanTimeToPositive }}</td>
+                    <td>{{ metrics.StdTimeToPositive }}</td>
+                    <td>{{ metrics.MeanTimeToNegative }}</td>
+                    <td>{{ metrics.StdTimeToNegative }}</td>
+                    <td>{{ metrics.MarginCalls }}</td>
+                    <td>{{ metrics.StopOuts }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div id="equity-plot"></div>
+
+        <!-- Guardar los datos del gráfico en un script JSON -->
+        <script id="equity-plot-data" type="application/json">
+            {{ equity_plot | safe }}
+        </script>
+    </div>
+{% endif %}

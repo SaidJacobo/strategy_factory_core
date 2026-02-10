@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Systems{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Systems</h1>
+
+    <!-- Botón Crear y Merge -->
+    <div class="d-flex justify-content-end gap-2 mb-3">
+        <a href="/systems/new" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i>
+        </a>
+    </div>
+
+    <!-- Tabla de sistemas -->
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for system in systems %}
+                <tr>
+                    <td>{{ system.Name }}</td>
+                    <td>{{ system.Description }}</td>
+                    <td class="d-flex gap-2">
+                        <a href="/systems/{{ system.Id }}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-wrench"></i>
+                        </a>
+                        <a href="/systems/admin/{{ system.Id }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-folder-open"></i>
+                        </a>
+                        <form action="/systems/{{ system.Id }}/delete" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

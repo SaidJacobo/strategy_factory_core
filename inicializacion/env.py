@@ -5,25 +5,6 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from app.backbone.entities import Base
-from app.backbone.entities.bot import Bot
-from app.backbone.entities.metric_wharehouse import MetricWharehouse
-from app.backbone.entities.strategy import Strategy
-from app.backbone.entities.ticker import Ticker
-from app.backbone.entities.category import Category
-from app.backbone.entities.timeframe import Timeframe
-from app.backbone.entities.portfolio import Portfolio
-from app.backbone.entities.portfolio_backtest import PortfolioBacktest
-from app.backbone.entities.bot_performance import BotPerformance
-from app.backbone.entities.timeframe import Timeframe
-from app.backbone.entities.bot_trade_performance import BotTradePerformance
-from app.backbone.entities.trade import Trade
-from app.backbone.entities.montecarlo_test import MontecarloTest
-from app.backbone.entities.luck_test import LuckTest
-from app.backbone.entities.random_test import RandomTest
-from app.backbone.entities.system import System
-from app.backbone.entities.system_portfolio import SystemPortfolio
-
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -37,7 +18,7 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = Base.metadata
+target_metadata = None
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}New Portfolios{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-4">New System</h1>
+    <form action="/systems" method="post" class="w-50 mx-auto p-4 rounded shadow-sm">
+        <!-- Campo de nombre -->
+        <div class="mb-3">
+            <label for="name" class="form-label">Name:</label>
+            <input type="text" id="name" name="name" class="form-control" required placeholder="System name">
+        </div>
+        <!-- Campo de descripción -->
+        <div class="mb-3">
+            <label for="description" class="form-label">Description:</label>
+            <textarea id="description" name="description" class="form-control" rows="4" required placeholder="System description"></textarea>
+        </div>
+        <!-- Botón de enviar -->
+        <div class="text-center">
+            <button type="submit" class="btn btn-primary">Create</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

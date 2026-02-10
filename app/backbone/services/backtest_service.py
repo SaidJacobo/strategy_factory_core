@@ -214,9 +214,10 @@ class BacktestService:
         risks: float | List[float],
         save_bt_plot: str,
         queue: asyncio.Queue,
+        portfolio=False
         ) -> AsyncGenerator[str, None]:
         """
-        Executes multiple backtests in parallel for all combinations of strategies, tickers, timeframes and risks,
+        Executes multiple back/tests in parallel for all combinations of strategies, tickers, timeframes and risks,
         then saves results to the database while streaming progress updates.
 
         This function handles the complete backtesting pipeline:
@@ -283,7 +284,10 @@ class BacktestService:
             timeframes = [timeframes] if type(timeframes) != list else timeframes
             risks = [risks] if type(risks) != list else risks
   
-            combinations = itertools.product(strategies, tickers, timeframes, risks)
+            if not portfolio:
+                combinations = itertools.product(strategies, tickers, timeframes, risks)
+            else:
+                combinations = zip(strategies, tickers, timeframes, risks)
 
             async for combination in self.async_iterator(list(combinations)):
                 strategy, ticker, timeframe, risk = combination
@@ -588,6 +592,7 @@ class BacktestService:
                 .join(Timeframe, Bot.TimeframeId == Timeframe.Id)
                 .filter(
                     BotPerformance.RreturnDd != "NaN",
+                    BotPerformance.Trades > 100,
                     Timeframe.Selected == True
                 )
                 .group_by(Bot.StrategyId, Bot.TickerId)
@@ -642,6 +647,7 @@ class BacktestService:
                 .filter(
                     Bot.StrategyId == strategy_id,
                     BotPerformance.RreturnDd != "NaN",
+                    BotPerformance.Trades > 100,
                     Timeframe.Selected == True,
                 )
                 .group_by(Bot.StrategyId, Bot.TickerId)

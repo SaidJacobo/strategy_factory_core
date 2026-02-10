@@ -1,0 +1,471 @@
+{% extends "base.html" %}
+
+{% block title %}System{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">System {{ system.Name }}</h1>
+
+    <label class="form-label mb-0">Run this system</label>
+    <div class="d-flex justify-content-between align-items-end mb-3">
+
+        <!-- Formulario a la izquierda -->
+        <form action="/systems/run/{{ system.Id }}" method="post" class="d-flex align-items-end gap-2">
+    
+            <input type="date" id="date_from" name="date_from" class="form-control" required>
+    
+            <input type="date" id="date_to" name="date_to" class="form-control" required>
+    
+            <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure?')">
+                <i class="fas fa-play-circle"></i>
+            </button>
+        </form>
+    
+        <!-- Botones a la derecha -->
+        <div class="d-flex gap-2">
+            <a href="#" class="btn btn-primary open-candidates" data-url="/systems/admin/{{ system.Id }}/candidates">
+                <i class="fas fa-plus-circle"></i>
+            </a>
+
+            <a class="btn btn-primary" href="/system_reports/{{ system.Id }}.html" target="_blank">
+                <i class="fas fa-file"></i>
+            </a>
+
+            <a href="#" class="btn btn-primary" id="deploy-button" data-id="{{ system.Id }}">
+                <i class="fas fa-rocket"></i>
+            </a>
+        </div>
+    
+    </div>
+    
+    <div id="portfolioMetrics">
+        {% if system.GroupedMetrics is none %}
+            <div style="display: flex; justify-content: center; align-items: center; height: 50vh; text-align: center;">
+                <p style="font-size: 1.5rem;">There are no metrics for this portfolio</p>
+            </div>
+        {% else %}
+            <div class="table-responsive">
+                <table id="metricsTable" class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>SharpeRatio</th>
+                            <th>StabilityRatio</th>
+                            <th>Return</th>
+                            <th>Drawdown</th>
+                            <th>RreturnDd</th>
+                            <th>MeanReturns</th>
+                            <th>StdReturns</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ system.GroupedMetrics.SharpeRatio }}</td>
+                            <td>{{ system.GroupedMetrics.StabilityRatio }}</td>
+                            <td>{{ system.GroupedMetrics.Return }}</td>
+                            <td>{{ system.GroupedMetrics.Drawdown }}</td>
+                            <td>{{ system.GroupedMetrics.RreturnDd }}</td>
+                            <td>{{ system.GroupedMetrics.MeanReturns }}</td>
+                            <td>{{ system.GroupedMetrics.StdReturns }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table id="metricsTable" class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Jarque Bera</th>
+                            <th>Jarque Bera p-value</th>
+                            <th>Skew</th>
+                            <th>Kurtosis</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ system.GroupedMetrics.JarqueBeraStat }}</td>
+                            <td>{{ system.GroupedMetrics.JarqueBeraPValue }}</td>
+                            <td>{{ system.GroupedMetrics.Skew }}</td>
+                            <td>{{ system.GroupedMetrics.Kurtosis }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-responsive">
+                <table id="challengeTable" class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>PositiveHits</th>
+                            <th>NegativeHits</th>
+                            <th>SuccessRatio</th>
+                            <th>MeanTimeToPositive</th>
+                            <th>StdTimeToPositive</th>
+                            <th>MeanTimeToNegative</th>
+                            <th>StdTimeToNegative</th>
+                            <th>MarginCalls</th>
+                            <th>StopOuts</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ system.GroupedMetrics.PositiveHits }}</td>
+                            <td>{{ system.GroupedMetrics.NegativeHits }}</td>
+                            <td>{{ system.GroupedMetrics.SuccessRatio }}</td>
+                            <td>{{ system.GroupedMetrics.MeanTimeToPositive }}</td>
+                            <td>{{ system.GroupedMetrics.StdTimeToPositive }}</td>
+                            <td>{{ system.GroupedMetrics.MeanTimeToNegative }}</td>
+                            <td>{{ system.GroupedMetrics.StdTimeToNegative }}</td>
+                            <td>{{ system.GroupedMetrics.MarginCalls }}</td>
+                            <td>{{ system.GroupedMetrics.StopOuts }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div id="equity-plot"></div>
+
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="d-flex justify-content-between align-items-end mb-3">
+
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <button class="btn btn-primary open-correlation-modal" data-url="/systems/admin/{{ system.Id }}/correlations">
+                <i class="fa fa-arrow-trend-up"></i>
+            </button>
+
+            <button class="btn btn-primary open-weights-modal" data-url="/systems/admin/{{ system.Id }}/weights">
+                <i class="fa fa-dumbbell"></i>
+            </button>
+        </div>
+
+        
+        <div class="d-flex gap-2">
+            <a href="#" id="run-button" class="btn btn-primary" data-action="/systems/run/{{ system.Id }}">
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table id="portfoliosTable" class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>SharpeRatio</th>
+                    <th>StabilityRatio</th>
+                    <th>Return</th>
+                    <th>Drawdown</th>
+                    <th>ReturnDd</th>
+                    <th>SuccessRatio</th>
+                    <th>Skew</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for portfolio in system.Portfolios %}
+                    <tr>
+                        <td>
+                            <span data-bs-toggle="tooltip" data-bs-placement="top" title="{{ portfolio.Description }}">
+                                <a href='/portfolios/admin/{{ portfolio.Id }}'>
+                                    {{ portfolio.Name }}
+                                </a>
+                            </span>
+                        </td>
+                        <td>{{ portfolio.GroupedMetrics.SharpeRatio }}</td>
+                        <td>{{ portfolio.GroupedMetrics.StabilityRatio }}</td>
+                        <td>{{ portfolio.GroupedMetrics.Return }}</td>
+                        <td>{{ portfolio.GroupedMetrics.Drawdown }}</td>
+                        <td>{{ portfolio.GroupedMetrics.RreturnDd }}</td>
+                        <td>{{ portfolio.GroupedMetrics.SuccessRatio }}</td>
+                        <td>{{ portfolio.GroupedMetrics.Skew }}</td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm btn-add toggle-add" data-portfolio-id="{{ portfolio.Id }}" data-reload="true">
+                                <i class="fas fa-minus-circle"></i>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="modal-container"></div>
+
+
+<script>
+    document.getElementById("run-button").addEventListener("click", function (e) {
+        e.preventDefault();
+
+        if (!confirm("Are you sure?")) return;
+
+        const action = this.getAttribute("data-action");
+
+        // Crear y enviar formulario POST de forma dinámica
+        const form = document.createElement("form");
+        form.method = "POST";
+        form.action = action;
+
+        document.body.appendChild(form);
+        form.submit();
+    });
+
+
+    const modifiedBots = new Set();
+    const systemId = "{{ system.Id }}";
+
+    const equityDiv = document.getElementById("equity-plot");
+    const equityPlotData = {{ equity_plot | tojson | safe }};
+    if (equityDiv && equityPlotData.data.length > 0) {
+        Plotly.newPlot("equity-plot", equityPlotData.data, equityPlotData.layout);
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        const modalContainer = document.getElementById("modal-container");
+
+        // Inicializa la tabla principal
+        $('#portfoliosTable').DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            order: [[1, 'desc']],
+        });
+
+        // Inicializa valores por defecto de fechas
+        const today = new Date();
+        const lastMonth = new Date();
+        lastMonth.setMonth(today.getMonth() - 1);
+        document.getElementById('date_to').value = today.toISOString().split('T')[0];
+        document.getElementById('date_from').value = lastMonth.toISOString().split('T')[0];
+
+        // Bind para los botones que abren modales
+        document.querySelectorAll(".open-candidates, .open-correlation-modal, .open-weights-modal").forEach(button => {
+            button.addEventListener("click", () => openDynamicModal(button));
+        });
+
+        // Botón de despliegue
+        document.getElementById("deploy-button").addEventListener("click", async function (e) {
+            e.preventDefault();
+            const portfolioId = this.getAttribute("data-id");
+
+            try {
+                const response = await fetch(`/systems/admin/${systemId}/deploy`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                });
+
+                const result = await response.json();
+                alert(result.ok ? "Despliegue exitoso!" : "Error: " + (result.message || "Algo salió mal"));
+            } catch (error) {
+                alert("Error en la solicitud: " + error.message);
+            }
+        });
+
+        // Delegación para agregar/quitar bots
+        document.addEventListener("click", async function (event) {
+            const button = event.target.closest(".toggle-add");
+            if (!button) return;
+
+            const portfolioId = button.getAttribute("data-portfolio-id");
+            const icon = button.querySelector("i");
+            const isAdding = icon.classList.contains("fa-plus-circle");
+            const url = `/systems/admin/${systemId}/${isAdding ? "add" : "delete"}/${portfolioId}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+
+                let data = await response.json();
+                data = JSON.parse(data);
+
+                if (response.ok && data.ok) {
+                    if (isAdding) {
+                        modifiedBots.add(portfolioId);
+                        icon.classList.replace("fa-plus-circle", "fa-minus-circle");
+                        button.classList.replace("btn-primary", "btn-danger");
+                    } else {
+                        if (modifiedBots.has(portfolioId)) {
+                            modifiedBots.delete(portfolioId);
+                        } else {
+                            modifiedBots.add(portfolioId);
+                        }
+                        icon.classList.replace("fa-minus-circle", "fa-plus-circle");
+                        button.classList.replace("btn-danger", "btn-primary");
+                    }
+
+                    const shouldReload = $(button).data('reload') === true;
+                    if (shouldReload) {
+                        // loadPortfolioMetrics();
+                    }
+                } else {
+                    alert(data.message || "Error inesperado.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Problema de conexión.");
+            }
+        });
+
+        // Carga de métricas del portafolio
+        // loadPortfolioMetrics();
+    });
+
+    function openDynamicModal(button) {
+        const url = button.dataset.url;
+
+        fetch(url)
+            .then(response => response.ok ? response.text() : Promise.reject("No se pudo cargar el modal."))
+            .then(html => {
+                const modalContainer = document.getElementById("modal-container");
+                modalContainer.innerHTML = html;
+
+                const modalElement = document.getElementById("botsModal");
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+
+                if (button.classList.contains("open-correlation-modal")) {
+                    renderCorrelationPlot();
+                }
+
+                if (document.getElementById("favoritesTable")) {
+                    initFavoritesTable(modalElement);
+                }
+
+                if (document.getElementById("weightsTable")) {
+                    initWeightsModal(modalElement);
+                }
+            })
+            .catch(error => console.error("Error:", error));
+    }
+
+    function renderCorrelationPlot() {
+        const script = document.getElementById("correlation-plot-data");
+        if (script) {
+            const data = JSON.parse(script.textContent);
+            Plotly.newPlot("correlation-plot", data.data, data.layout);
+        }
+    }
+
+    function initFavoritesTable(modalElement) {
+        $('#favoritesTable').DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            order: [[1, 'desc']],
+            pageLength: 20,
+            lengthMenu: [[5, 10, 20], [5, 10, 20, 'Todos']]
+        });
+
+        modalElement.addEventListener("hidden.bs.modal", function () {
+            if (modifiedBots.size > 0) {
+                location.reload();
+            }
+            modifiedBots.clear();
+        });
+    }
+
+    function initWeightsModal(modalElement) {
+        const saveButton = document.getElementById('saveWeightsButton');
+        if (!saveButton) return;
+
+        saveButton.addEventListener('click', async () => {
+            const portfolioId = parseInt(document.getElementById('id').value);
+            const rows = document.querySelectorAll('#weightsTable tbody tr');
+
+            const portfolioBacktests = [];
+            let totalWeight = 0;
+            let validationFailed = false;
+
+            rows.forEach(row => {
+                const input = row.querySelector('input[name="portfolio-id"]');
+                const weight = parseFloat(input.value);
+
+                if (isNaN(weight) || weight < 0) {
+                    validationFailed = true;
+                    input.classList.add("is-invalid");
+                } else {
+                    input.classList.remove("is-invalid");
+                    const portfolioName = row.querySelector('td').innerText.trim();
+                    portfolioBacktests.push({
+                        PortfolioId: parseInt(input.id),
+                        PortfolioName: portfolioName,
+                        PortfolioWeight: weight
+                    });
+                    totalWeight += weight;
+                }
+            });
+
+            // Mostrar error si algún peso está fuera de rango
+            if (validationFailed) {
+                alert("All weights must be greater than 0");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/systems/admin/${systemId}/weights`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(portfolioBacktests)
+                });
+
+                const result = await response.json();
+
+                console.log(result)
+
+                if (response.ok && result.ok) {
+                    alert(result.message || '¡Pesos actualizados exitosamente!');
+                    bootstrap.Modal.getInstance(modalElement)?.hide();
+                } else {
+                    alert(result.message || 'Error al guardar los pesos.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error de conexión con el servidor.');
+            }
+        });
+    }
+
+    async function loadPortfolioMetrics() {
+        const portfolioId = "{{ system.Id }}";
+        const url = `/portfolios/admin/${portfolioId}/metrics`;
+        const metricsDiv = document.getElementById("portfolioMetrics");
+
+        try {
+            metricsDiv.style.transition = "opacity 0.3s ease-out";
+            metricsDiv.style.opacity = "0";
+
+            const response = await fetch(url);
+            if (!response.ok) throw new Error("Error al obtener las métricas del portafolio.");
+
+            const html = await response.text();
+
+            setTimeout(() => {
+                metricsDiv.innerHTML = html;
+                metricsDiv.style.opacity = "1";
+
+                const plotScript = document.getElementById("portfolioMetrics").querySelector("#equity-plot-data");
+                if (plotScript) {
+                    const plotData = JSON.parse(plotScript.textContent);
+                    if (plotData.data && plotData.data.length > 0) {
+                        Plotly.newPlot('equity-plot', plotData.data, plotData.layout);
+                    }
+                }
+            }, 1);
+        } catch (error) {
+            console.error("❌ Error cargando las métricas:", error);
+        }
+    }
+</script>
+
+
+{% endblock %}

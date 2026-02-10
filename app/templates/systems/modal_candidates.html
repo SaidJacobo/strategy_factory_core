@@ -1,0 +1,49 @@
+<!-- Modal de Bootstrap -->
+<div class="modal fade" id="botsModal" tabindex="-1" aria-labelledby="botsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="botsModalLabel">Portfolios</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="max-height: 800px; overflow-y: auto;">
+                <div class="table-responsive">
+                    <table id="favoritesTable" class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>SharpeRatio</th>
+                                <th>StabilityRatio</th>
+                                <th>Return</th>
+                                <th>Drawdown</th>
+                                <th>RreturnDd</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pf in portfolios %}
+                                <tr>
+                                    <td>
+                                        <a href='/portfolios/admin/{{ pf.Id }}'>
+                                            {{ pf.Name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ pf.GroupedMetrics.SharpeRatio }}</td>
+                                    <td>{{ pf.GroupedMetrics.StabilityRatio }}</td>
+                                    <td>{{ pf.GroupedMetrics.Return }}</td>
+                                    <td>{{ pf.GroupedMetrics.Drawdown }}</td>
+                                    <td>{{ pf.GroupedMetrics.RreturnDd }}</td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary btn-sm btn-add toggle-add " data-portfolio-id="{{ pf.Id }}" data-reload="false">
+                                            <i class="fas fa-plus-circle"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

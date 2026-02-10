@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block title %}Portfolios{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Portfolios</h1>
+
+    <!-- Botón Crear y Merge -->
+    <div class="d-flex justify-content-end gap-2 mb-3">
+        <a href="#" class="btn btn-primary btn-equal disabled-link" id="merge-button" data-bs-toggle="modal" data-bs-target="#mergeModal">
+            <i class="fas fa-code-merge"></i>
+        </a>
+
+        <a href="/portfolios/new" class="btn btn-primary">
+            <i class="fas fa-plus-circle"></i>
+        </a>
+    </div>
+
+    <!-- Modal para confirmar merge -->
+    <div class="modal fade" id="mergeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Merge</h5>
+                    <button type="button" class="btn-close" data-bs-close="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="mergeForm" method="post" action="/portfolios/admin/merge">
+                        <div class="mb-3">
+                            <label for="newPortfolioName" class="form-label">New Portfolio Name</label>
+                            <input type="text" class="form-control" id="newPortfolioName" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="newPortfolioDescription" class="form-label">Description</label>
+                            <textarea class="form-control" id="newPortfolioDescription" name="description"></textarea>
+                        </div>
+                        <input type="hidden" name="portfolio_ids" id="portfolioIds">
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" form="mergeForm" class="btn btn-primary">Merge</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de Portfolios -->
+    <div class="table-responsive">
+        <table class="table table-custom">
+            <thead>
+                <tr>
+                    <th width="40px"></th>
+                    <th>Name</th>
+                    <th>SharpeRatio</th>
+                    <th>StabilityRatio</th>
+                    <th>Return</th>
+                    <th>Drawdown</th>
+                    <th>ReturnDd</th>
+                    <th>SuccessRatio</th>
+                    <th>Skew</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for portfolio in portfolios %}
+                <tr>
+                    <td>
+                        <input type="checkbox" class="portfolio-checkbox" value="{{ portfolio.Id }}">
+                    </td>
+                    <td>
+                        <span data-bs-toggle="tooltip" data-bs-placement="top" title="{{ portfolio.Description }}">
+                            {{ portfolio.Name }}
+                        </span>
+                    </td>
+                    <td>{{ portfolio.GroupedMetrics.SharpeRatio }}</td>
+                    <td>{{ portfolio.GroupedMetrics.StabilityRatio }}</td>
+                    <td>{{ portfolio.GroupedMetrics.Return }}</td>
+                    <td>{{ portfolio.GroupedMetrics.Drawdown }}</td>
+                    <td>{{ portfolio.GroupedMetrics.RreturnDd }}</td>
+                    <td>{{ portfolio.GroupedMetrics.SuccessRatio }}</td>
+                    <td>{{ portfolio.GroupedMetrics.Skew }}</td>
+
+
+                    <td class="d-flex gap-2">
+                        <a href="/portfolios/{{ portfolio.Id }}" class="btn btn-sm btn-warning">
+                            <i class="fas fa-wrench"></i>
+                        </a>
+                        <a href="/portfolios/admin/{{ portfolio.Id }}" class="btn btn-sm btn-primary">
+                            <i class="fas fa-robot"></i>
+                        </a>
+                        <form action="/portfolios/{{ portfolio.Id }}/delete" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.forEach(function (tooltipTriggerEl) {
+            new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        const checkboxes = document.querySelectorAll('.portfolio-checkbox');
+        const mergeButton = document.getElementById('merge-button');
+        const portfolioIdsInput = document.getElementById('portfolioIds');
+        
+        function updateMergeButton() {
+            const selectedIds = Array.from(checkboxes)
+                .filter(cb => cb.checked)
+                .map(cb => cb.value);
+
+            if (selectedIds.length < 2) {
+                mergeButton.classList.add('disabled-link');
+            } else {
+                mergeButton.classList.remove('disabled-link');
+            }
+        }
+        
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+                updateMergeButton();
+                
+                // Actualizar el valor del input hidden cuando cambia la selección
+                const selectedIds = Array.from(document.querySelectorAll('.portfolio-checkbox:checked'))
+                    .map(cb => cb.value);
+                portfolioIdsInput.value = selectedIds.join(',');
+            });
+        });
+        
+        // Inicializar el estado del botón
+        updateMergeButton();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,61 @@
+<!-- Modal de Bootstrap -->
+<div class="modal fade" id="botsModal" tabindex="-1" aria-labelledby="botsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="botsModalLabel">Robusts performers</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="max-height: 800px; overflow-y: auto;">
+                <div class="table-responsive">
+                    <table id="favoritesTable" class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Bot</th>
+                                <th>Ticker</th>
+                                <th>SharpeRatio</th>
+                                <th>StabilityRatio</th>
+                                <th>Trades</th>
+                                <th>Return</th>
+                                <th>Drawdown</th>
+                                <th>RreturnDd</th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for performance in favorites_and_robusts %}
+                                <tr>
+                                    <td>
+                                        <a href='/backtest/bot/{{ performance.BotId }}?date_from={{ performance.DateFrom }}&date_to={{ performance.DateTo }}'>
+                                            {{ performance.Bot.Name }}
+                                        </a>
+                                    </td>
+                                    <td>{{ performance.Bot.Ticker.Name }}</td>
+                                    <td>{{ performance.SharpeRatio }}</td>
+                                    <td>{{ performance.StabilityRatio }}</td>
+                                    <td>{{ performance.Trades }}</td>
+                                    <td>{{ performance.Return }}</td>
+                                    <td>{{ performance.Drawdown }}</td>
+                                    <td>{{ performance.RreturnDd }}</td>
+                                    <td>
+                                        {% if performance.Favorite %}
+                                            <i class="fas fa-star"></i> <!-- Estrella llena -->
+                                        {% else %}
+                                            <i class="far fa-star"></i> <!-- Estrella vacía -->
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-primary btn-sm btn-add toggle-add " data-performance-id="{{ performance.Id }}" data-reload="false">
+                                            <i class="fas fa-plus-circle"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

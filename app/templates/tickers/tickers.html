@@ -11,6 +11,7 @@
                 <tr>
                     <th>Ticker</th>
                     <th>Spread</th>
+                    <th>Commission</th>
                 </tr>
             </thead>
             <tbody>
@@ -18,6 +19,13 @@
                 <tr>
                     <td>{{ ticker.Name }}</td>
                     <td>{{ ticker.Spread  }}</td>
+                    <td>
+                        <input 
+                            type="number" 
+                            name="" 
+                            value="0" 
+                            class="form-control commission-input">
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

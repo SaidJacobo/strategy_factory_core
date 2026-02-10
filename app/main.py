@@ -12,7 +12,7 @@ import webbrowser
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from app.routers import admin_router, backtest_router, categories_router, strategies_router
+from app.routers import admin_router, backtest_router, categories_router, strategies_router, portfolios_router, system_router
 from fastapi.staticfiles import StaticFiles
 import uvicorn
 from app.backbone.services.config_service import ConfigService
@@ -24,11 +24,12 @@ app.include_router(strategies_router.router)
 app.include_router(categories_router.router)
 app.include_router(backtest_router.router)
 app.include_router(admin_router.router)
+app.include_router(portfolios_router.router)
+app.include_router(system_router.router)
 
 templates = Jinja2Templates(directory="./app/templates")
 
 app.mount("/static", StaticFiles(directory="./app/templates/static"), name="static")
-
 
 backtests_plot_path = './app/templates/static/backtest_plots'
 if not os.path.exists(backtests_plot_path):
@@ -38,8 +39,28 @@ reports_path = './app/templates/static/backtest_plots/reports'
 if not os.path.exists(reports_path):
     os.mkdir(reports_path)
 
+portfolio_reports_path = './app/templates/static/portfolio_reports'
+if not os.path.exists(portfolio_reports_path):
+    os.mkdir(portfolio_reports_path)
+
+system_reports_path = './app/templates/static/system_reports'
+if not os.path.exists(system_reports_path):
+    os.mkdir(system_reports_path)
+
+system_plots_path = './app/templates/static/system_plots'
+if not os.path.exists(system_plots_path):
+    os.mkdir(system_plots_path)
+
+portfolio_plots_path = './app/templates/static/portfolio_plots'
+if not os.path.exists(portfolio_plots_path):
+    os.mkdir(portfolio_plots_path)
+    
 app.mount("/backtest_plots", StaticFiles(directory=backtests_plot_path), name="backtest_plots")
 app.mount("/backtest_plots/reports", StaticFiles(directory=reports_path), name="reports_plots")
+app.mount("/portfolio_reports", StaticFiles(directory=reports_path), name="portfolio_reports")
+app.mount("/system_reports", StaticFiles(directory=system_reports_path), name="system_reports")
+app.mount("/system_plots", StaticFiles(directory=reports_path), name="system_plots")
+app.mount("/portfolio_plots", StaticFiles(directory=reports_path), name="portfolio_plots")
 
 config_service = ConfigService()
 ticker_service = TickerService()
@@ -77,6 +98,6 @@ if __name__ == "__main__":
 
     subprocess.run(["alembic", "upgrade", "head"])
     subprocess.Popen([sys.executable, "./app/live_trading.py"], )
-    webbrowser.open("http://127.0.0.1:8001")
-    uvicorn.run(app, host="127.0.0.1", port=8001)
+    webbrowser.open("http://127.0.0.2:8002")
+    uvicorn.run(app, host="127.0.0.2", port=8002)
     

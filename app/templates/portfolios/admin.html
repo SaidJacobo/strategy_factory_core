@@ -1,0 +1,452 @@
+{% extends "base.html" %}
+
+{% block title %}Portfolio{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <h1 class="text-center mb-4">Portfolio {{ portfolio.Name }}</h1>
+
+    <label class="form-label mb-0">Run this portfolio</label>
+    <div class="d-flex justify-content-between align-items-end mb-3">
+
+        <!-- Formulario a la izquierda -->
+        <form action="/portfolios/run/{{ portfolio.Id }}" method="post" class="d-flex align-items-end gap-2">
+    
+            <input type="date" id="date_from" name="date_from" class="form-control" required>
+    
+            <input type="date" id="date_to" name="date_to" class="form-control" required>
+            
+            <button type="submit" class="btn btn-primary" onclick="return confirm('Are you sure?')">
+                <i class="fas fa-play-circle"></i>
+            </button>
+        </form>
+    
+        <!-- Botones a la derecha -->
+        <div class="d-flex gap-2">
+            <a href="#" class="btn btn-primary open-candidates" data-url="/portfolios/{{ portfolio.Id }}/candidates">
+                <i class="fas fa-plus-circle"></i>
+            </a>
+            <a href="#" class="btn btn-primary" id="report-button" data-id="{{ portfolio.Id }}">
+                <i class="fas fa-file"></i>
+            </a>
+            <a href="#" class="btn btn-primary" id="deploy-button" data-id="{{ portfolio.Id }}">
+                <i class="fas fa-rocket"></i>
+            </a>
+        </div>
+
+    
+    </div>
+    
+    <div id="portfolioMetrics">
+        {% if portfolio.GroupedMetrics is none %}
+            <div style="display: flex; justify-content: center; align-items: center; height: 50vh; text-align: center;">
+                <p style="font-size: 1.5rem;">There are no metrics for this portfolio</p>
+            </div>
+        {% else %}
+            <div class="table-responsive">
+                <table id="metricsTable" class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>SharpeRatio</th>
+                            <th>StabilityRatio</th>
+                            <th>Return</th>
+                            <th>Drawdown</th>
+                            <th>RreturnDd</th>
+                            <th>MeanReturns</th>
+                            <th>StdReturns</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ portfolio.GroupedMetrics.SharpeRatio }}</td>
+                            <td>{{ portfolio.GroupedMetrics.StabilityRatio }}</td>
+                            <td>{{ portfolio.GroupedMetrics.Return }}</td>
+                            <td>{{ portfolio.GroupedMetrics.Drawdown }}</td>
+                            <td>{{ portfolio.GroupedMetrics.RreturnDd }}</td>
+                            <td>{{ portfolio.GroupedMetrics.MeanReturns }}</td>
+                            <td>{{ portfolio.GroupedMetrics.StdReturns }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+                <table id="metricsTable" class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>Jarque Bera</th>
+                            <th>Jarque Bera p-value</th>
+                            <th>Skew</th>
+                            <th>Kurtosis</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ portfolio.GroupedMetrics.JarqueBeraStat }}</td>
+                            <td>{{ portfolio.GroupedMetrics.JarqueBeraPValue }}</td>
+                            <td>{{ portfolio.GroupedMetrics.Skew }}</td>
+                            <td>{{ portfolio.GroupedMetrics.Kurtosis }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-responsive">
+                <table id="challengeTable" class="table table-custom">
+                    <thead>
+                        <tr>
+                            <th>PositiveHits</th>
+                            <th>NegativeHits</th>
+                            <th>SuccessRatio</th>
+                            <th>MeanTimeToPositive</th>
+                            <th>StdTimeToPositive</th>
+                            <th>MeanTimeToNegative</th>
+                            <th>StdTimeToNegative</th>
+                            <th>MarginCalls</th>
+                            <th>StopOuts</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ portfolio.GroupedMetrics.PositiveHits }}</td>
+                            <td>{{ portfolio.GroupedMetrics.NegativeHits }}</td>
+                            <td>{{ portfolio.GroupedMetrics.SuccessRatio }}</td>
+                            <td>{{ portfolio.GroupedMetrics.MeanTimeToPositive }}</td>
+                            <td>{{ portfolio.GroupedMetrics.StdTimeToPositive }}</td>
+                            <td>{{ portfolio.GroupedMetrics.MeanTimeToNegative }}</td>
+                            <td>{{ portfolio.GroupedMetrics.StdTimeToNegative }}</td>
+                            <td>{{ portfolio.GroupedMetrics.MarginCalls }}</td>
+                            <td>{{ portfolio.GroupedMetrics.StopOuts }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div id="equity-plot"></div>
+
+                <!-- Guardar los datos del gráfico en un script JSON -->
+                <script id="equity-plot-data" type="application/json">
+                    {{ equity_plot | safe }}
+                </script>
+            </div>
+        {% endif %}
+        
+    </div>
+        <div class="d-flex justify-content-between align-items-end mb-3">
+
+            <div class="d-flex justify-content-between align-items-end mb-3">
+
+                <button class="btn btn-primary open-correlation-modal" data-url="/portfolios/admin/{{ portfolio.Id }}/correlations">
+                    <i class="fa fa-arrow-trend-up"></i>
+                </button>
+
+                <button class="btn btn-primary open-weights-modal" data-url="/portfolios/admin/{{ portfolio.Id }}/weights">
+                    <i class="fa fa-dumbbell"></i>
+                </button>
+            </div>
+
+        <div class="d-flex gap-2">
+            <a href="#" id="run-button" class="btn btn-primary" data-action="/portfolios/metrics/{{ portfolio.Id }}">
+                <i class="fa-solid fa-arrows-rotate"></i>
+            </a>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table id="botsTable" class="table table-custom">
+            <thead>
+                <tr>
+                    <th>Bot</th>
+                    <th>Ticker</th>
+                    <th>SharpeRatio</th>
+                    <th>StabilityRatio</th>
+                    <th>WinRate</th>
+                    <th>Trades</th>
+                    <th>Return</th>
+                    <th>Drawdown</th>
+                    <th>RreturnDd</th>
+                    <th>StabilityWeightedRar</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for performance in portfolio.BotPerformances %}
+                    <tr>
+                        <td>
+                            <a href='/backtest/bot/{{ performance.BotId }}?date_from={{ performance.DateFrom }}&date_to={{ performance.DateTo }}'>
+                                {{ performance.Bot.Name }}
+                            </a>
+                        </td>
+                        <td>{{ performance.Bot.Ticker.Name }}</td>
+                        <td>{{ performance.SharpeRatio }}</td>
+                        <td>{{ performance.StabilityRatio }}</td>
+                        <td>{{ performance.WinRate }}</td>
+                        <td>{{ performance.Trades }}</td>
+                        <td>{{ performance.Return }}</td>
+                        <td>{{ performance.Drawdown }}</td>
+                        <td>{{ performance.RreturnDd }}</td>
+                        <td>{{ performance.StabilityWeightedRar }}</td>
+                        <td>
+                            <button type="button" class="btn btn-danger btn-sm btn-add toggle-add" data-performance-id="{{ performance.Id }}">
+                                <i class="fas fa-minus-circle"></i>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="modal-container"></div>
+
+<script>
+
+    const equityDiv = document.getElementById("equity-plot");
+    const equityPlotData = {{ equity_plot | tojson | safe }};
+    if (equityDiv && equityPlotData.data.length > 0) {
+        Plotly.newPlot("equity-plot", equityPlotData.data, equityPlotData.layout);
+    }
+
+    const modifiedBots = new Set();
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const portfolioId = "{{ portfolio.Id }}";
+        const modalContainer = document.getElementById("modal-container");
+
+        // Inicializa la tabla principal
+        $('#botsTable').DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            order: [[2, 'desc']],
+        });
+
+        // Inicializa valores por defecto de fechas
+        const today = new Date();
+        const lastMonth = new Date();
+        lastMonth.setMonth(today.getMonth() - 1);
+        document.getElementById('date_to').value = today.toISOString().split('T')[0];
+        document.getElementById('date_from').value = lastMonth.toISOString().split('T')[0];
+
+        // Bind para los botones que abren modales
+        document.querySelectorAll(".open-candidates, .open-correlation-modal, .open-weights-modal").forEach(button => {
+            button.addEventListener("click", () => openDynamicModal(button));
+        });
+
+        // Botón de reportes
+        document.getElementById("report-button").addEventListener("click", async function (e) {
+            e.preventDefault();
+            const portfolioId = this.getAttribute("data-id");
+
+            const response = await fetch(`/portfolios/admin/${portfolioId}/report`, { method: "POST" });
+            const data = await response.json();
+
+            if (data.url) {
+                window.open(data.url, '_blank');
+            } else {
+                alert("No se pudo generar el reporte.");
+            }
+        });
+
+        // Botón de despliegue
+        document.getElementById("deploy-button").addEventListener("click", async function (e) {
+            e.preventDefault();
+            const portfolioId = this.getAttribute("data-id");
+
+            try {
+                const response = await fetch(`/portfolios/admin/${portfolioId}/deploy`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                });
+
+                const result = await response.json();
+                alert(result.ok ? "Despliegue exitoso!" : "Error: " + (result.message || "Algo salió mal"));
+            } catch (error) {
+                alert("Error en la solicitud: " + error.message);
+            }
+        });
+
+        document.getElementById("run-button").addEventListener("click", function (e) {
+            e.preventDefault();
+
+            if (!confirm("Are you sure?")) return;
+
+            const action = this.getAttribute("data-action");
+
+            // Crear y enviar formulario POST de forma dinámica
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = action;
+
+            document.body.appendChild(form);
+            form.submit();
+        });
+
+        // Delegación para agregar/quitar bots
+        document.addEventListener("click", async function (event) {
+            const button = event.target.closest(".toggle-add");
+            if (!button) return;
+
+            const performanceId = button.getAttribute("data-performance-id");
+            const icon = button.querySelector("i");
+            const isAdding = icon.classList.contains("fa-plus-circle");
+            const url = `/portfolios/admin/${portfolioId}/${isAdding ? "add" : "delete"}/${performanceId}`;
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                });
+
+                let data = await response.json();
+                data = JSON.parse(data);
+
+                if (response.ok && data.ok) {
+                    if (isAdding) {
+                        modifiedBots.add(performanceId);
+                        icon.classList.replace("fa-plus-circle", "fa-minus-circle");
+                        button.classList.replace("btn-primary", "btn-danger");
+                    } else {
+                        if (modifiedBots.has(performanceId)) {
+                            modifiedBots.delete(performanceId);
+                        } else {
+                            modifiedBots.add(performanceId);
+                        }
+                        icon.classList.replace("fa-minus-circle", "fa-plus-circle");
+                        button.classList.replace("btn-danger", "btn-primary");
+                    }
+
+                } else {
+                    alert(data.message || "Error inesperado.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Problema de conexión.");
+            }
+        });
+    });
+
+    function openDynamicModal(button) {
+        const url = button.dataset.url;
+
+        fetch(url)
+            .then(response => response.ok ? response.text() : Promise.reject("No se pudo cargar el modal."))
+            .then(html => {
+                const modalContainer = document.getElementById("modal-container");
+                modalContainer.innerHTML = html;
+
+                const modalElement = document.getElementById("botsModal");
+                const modal = new bootstrap.Modal(modalElement);
+                modal.show();
+
+                if (button.classList.contains("open-correlation-modal")) {
+                    renderCorrelationPlot();
+                }
+
+                if (document.getElementById("favoritesTable")) {
+                    initFavoritesTable(modalElement);
+                }
+
+                if (document.getElementById("weightsTable")) {
+                    initWeightsModal(modalElement);
+                }
+            })
+            .catch(error => console.error("Error:", error));
+    }
+
+    function renderCorrelationPlot() {
+        const script = document.getElementById("correlation-plot-data");
+        if (script) {
+            const data = JSON.parse(script.textContent);
+            Plotly.newPlot("correlation-plot", data.data, data.layout);
+        }
+    }
+
+    function initFavoritesTable(modalElement) {
+        $('#favoritesTable').DataTable({
+            paging: true,
+            searching: true,
+            ordering: true,
+            info: true,
+            order: [[2, 'desc']],
+            pageLength: 20,
+            lengthMenu: [[5, 10, 20], [5, 10, 20, 'Todos']]
+        });
+
+        modalElement.addEventListener("hidden.bs.modal", function () {
+            if (modifiedBots.size > 0) {
+                location.reload();
+            }
+            modifiedBots.clear();
+        });
+    }
+
+    function initWeightsModal(modalElement) {
+        const saveButton = document.getElementById('saveWeightsButton');
+        if (!saveButton) return;
+
+        saveButton.addEventListener('click', async () => {
+            const portfolioId = parseInt(document.getElementById('id').value);
+            const rows = document.querySelectorAll('#weightsTable tbody tr');
+
+            const portfolioBacktests = [];
+            let totalWeight = 0;
+            let validationFailed = false;
+
+            rows.forEach(row => {
+                const input = row.querySelector('input[name="bot-id"]');
+                const weight = parseFloat(input.value);
+
+                if (isNaN(weight) || weight < 0 || weight > 1) {
+                    validationFailed = true;
+                    input.classList.add("is-invalid");
+                } else {
+                    input.classList.remove("is-invalid");
+                    const botName = row.querySelector('td').innerText.trim();
+                    portfolioBacktests.push({
+                        BacktestId: parseInt(input.id),
+                        BotName: botName,
+                        BotWeight: weight
+                    });
+                    totalWeight += weight;
+                }
+            });
+
+            // Mostrar error si algún peso está fuera de rango
+            if (validationFailed) {
+                alert("Todos los pesos deben estar entre 0 y 1.");
+                return;
+            }
+
+            // Validar suma total
+            const tolerance = 0.00001;
+            if (Math.abs(totalWeight - 1.0) > tolerance) {
+                alert("La suma total de los pesos debe ser exactamente 1.");
+                return;
+            }
+
+            try {
+                const response = await fetch(`/portfolios/admin/${portfolioId}/weights`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(portfolioBacktests)
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.ok) {
+                    alert(result.message || '¡Pesos actualizados exitosamente!');
+                    bootstrap.Modal.getInstance(modalElement)?.hide();
+                } else {
+                    alert(result.message || 'Error al guardar los pesos.');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error de conexión con el servidor.');
+            }
+        });
+    }
+</script>
+
+{% endblock %}
+

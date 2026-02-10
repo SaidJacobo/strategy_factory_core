@@ -1,0 +1,249 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/137.0.0.0 Safari/537.36" version="27.1.6" pages="4">
+  <diagram name="StrategyFactory class" id="xVff3TjK5di_Uj27Rq_w">
+    <mxGraphModel dx="1106" dy="631" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="RvWE2HMB7tmS0TNgjqeQ-4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="RvWE2HMB7tmS0TNgjqeQ-1" target="RvWE2HMB7tmS0TNgjqeQ-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RvWE2HMB7tmS0TNgjqeQ-5" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="RvWE2HMB7tmS0TNgjqeQ-1" target="RvWE2HMB7tmS0TNgjqeQ-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="RvWE2HMB7tmS0TNgjqeQ-1" value="&lt;font style=&quot;font-size: 18px;&quot;&gt;StrategyFactory&lt;/font&gt;" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#ffe6cc;strokeColor=#d79b00;" vertex="1" parent="1">
+          <mxGeometry x="13" y="386.5" width="360" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="RvWE2HMB7tmS0TNgjqeQ-2" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="632" y="386.5" width="160" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="RvWE2HMB7tmS0TNgjqeQ-3" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="632" y="576.5" width="160" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="RvWE2HMB7tmS0TNgjqeQ-6" value="&lt;font style=&quot;font-size: 17px;&quot;&gt;self.buy(...)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="357" y="369.5" width="146" height="67" as="geometry" />
+        </mxCell>
+        <mxCell id="RvWE2HMB7tmS0TNgjqeQ-7" value="&lt;font style=&quot;font-size: 17px;&quot;&gt;self.sell(...)&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="357" y="413.5" width="146" height="67" as="geometry" />
+        </mxCell>
+        <mxCell id="RvWE2HMB7tmS0TNgjqeQ-8" value="&lt;font style=&quot;font-size: 17px;&quot;&gt;self.position&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;strokeWidth=1;" vertex="1" parent="1">
+          <mxGeometry x="357" y="455.5" width="146" height="67" as="geometry" />
+        </mxCell>
+        <mxCell id="RvWE2HMB7tmS0TNgjqeQ-9" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://www.radexmarkets.com/images/mt5-logo.png;" vertex="1" parent="1">
+          <mxGeometry x="659.51" y="619" width="104.99" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="RvWE2HMB7tmS0TNgjqeQ-10" value="" style="shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=https://greyhoundanalytics.com/blog/backtestingpy-a-complete-quickstart-guide/featured-720.png;" vertex="1" parent="1">
+          <mxGeometry x="651.38" y="431" width="126.22" height="71" as="geometry" />
+        </mxCell>
+        <mxCell id="RvWE2HMB7tmS0TNgjqeQ-11" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;¿Cómo llamar a distintas clases con el mismo código? No queremos cambiar el código de la estrategia&lt;/h1&gt;&lt;p&gt;Cuando estamos en backtesting debemos llamar al Strategy de bt.py, pero cuando estamos en live debemos llamar a MetaTrader&lt;/p&gt;" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="36" y="109" width="322" height="222" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="T7Y1sFC4S1e8SO8bgWbG" name="Live trading module">
+    <mxGraphModel dx="1301" dy="742" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="-DpaQ5sAiWDvGAaV4-Pr-1" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#e1d5e7;strokeColor=#9673a6;" vertex="1" parent="1">
+          <mxGeometry x="82" y="230" width="227" height="227" as="geometry" />
+        </mxCell>
+        <mxCell id="-DpaQ5sAiWDvGAaV4-Pr-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;curved=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="-DpaQ5sAiWDvGAaV4-Pr-2" target="-DpaQ5sAiWDvGAaV4-Pr-4">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="196" y="457" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="-DpaQ5sAiWDvGAaV4-Pr-2" value="Prices&lt;div&gt;file&lt;/div&gt;" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.document;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="378" y="521" width="100" height="153" as="geometry" />
+        </mxCell>
+        <mxCell id="-DpaQ5sAiWDvGAaV4-Pr-3" value="" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#d5e8d4;strokeColor=#82b366;" vertex="1" parent="1">
+          <mxGeometry x="533" y="230" width="226" height="226" as="geometry" />
+        </mxCell>
+        <mxCell id="-DpaQ5sAiWDvGAaV4-Pr-19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;" edge="1" parent="1" source="-DpaQ5sAiWDvGAaV4-Pr-4" target="-DpaQ5sAiWDvGAaV4-Pr-10">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-DpaQ5sAiWDvGAaV4-Pr-4" value="Listener" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="101" y="335" width="93" height="93" as="geometry" />
+        </mxCell>
+        <mxCell id="-DpaQ5sAiWDvGAaV4-Pr-5" value="Saver Bot" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f8cecc;strokeColor=#b85450;" vertex="1" parent="1">
+          <mxGeometry x="602" y="361" width="93" height="93" as="geometry" />
+        </mxCell>
+        <mxCell id="-DpaQ5sAiWDvGAaV4-Pr-6" value="StrategyFactory" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;" vertex="1" parent="1">
+          <mxGeometry x="165.5" y="195" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="-DpaQ5sAiWDvGAaV4-Pr-7" value="MT5" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=20;" vertex="1" parent="1">
+          <mxGeometry x="610.5" y="198" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="-DpaQ5sAiWDvGAaV4-Pr-8" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.99;entryY=0.58;entryDx=0;entryDy=0;entryPerimeter=0;curved=1;" edge="1" parent="1" source="-DpaQ5sAiWDvGAaV4-Pr-3" target="-DpaQ5sAiWDvGAaV4-Pr-2">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-DpaQ5sAiWDvGAaV4-Pr-12" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;" edge="1" parent="1" source="-DpaQ5sAiWDvGAaV4-Pr-10" target="-DpaQ5sAiWDvGAaV4-Pr-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="-DpaQ5sAiWDvGAaV4-Pr-10" value="Bot" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="228" y="302.5" width="81" height="81" as="geometry" />
+        </mxCell>
+        <mxCell id="-DpaQ5sAiWDvGAaV4-Pr-13" value="1. Save the new file" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="488" y="524" width="123" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="-DpaQ5sAiWDvGAaV4-Pr-14" value="2. Get the new file" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="239" y="534" width="115" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="-DpaQ5sAiWDvGAaV4-Pr-15" value="4. Execute the strategy" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="101" y="300" width="141" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="-DpaQ5sAiWDvGAaV4-Pr-16" value="Live Trading Module" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=40;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="225.5" y="69" width="437" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="-DpaQ5sAiWDvGAaV4-Pr-17" value="5. Send the order" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="361" y="294" width="111" height="26" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="oR9bdSNekj1_NlUO9yVd" name="Backtesting Module">
+    <mxGraphModel dx="1106" dy="631" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-28" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="xiQpPHeIePDQWWcUJ-XS-24" target="xiQpPHeIePDQWWcUJ-XS-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-11" value="&lt;span style=&quot;text-wrap-mode: nowrap;&quot;&gt;Quiero ejecutar las estrategias E1 y E2&lt;/span&gt;&lt;div style=&quot;text-wrap-mode: nowrap;&quot;&gt;Para el ticker EURUSD&lt;/div&gt;&lt;div style=&quot;text-wrap-mode: nowrap;&quot;&gt;para las temporalidades H3 y H4, por favor :)&lt;/div&gt;" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.roundRectCallout;dx=30;dy=15;size=5;boundedLbl=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="361" y="185" width="261" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-5" value="Meta Trader 5" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;direction=south;" vertex="1" parent="1">
+          <mxGeometry x="598" y="494.25" width="117" height="117" as="geometry" />
+        </mxCell>
+        <mxCell id="agrgxw6-Ba6Qbf7EIvka-2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0.5;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="xiQpPHeIePDQWWcUJ-XS-7" target="agrgxw6-Ba6Qbf7EIvka-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-7" value="Vos" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="348" y="268" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-18" value="1. Generación de combinaciones" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="434.45" y="411" width="193" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-23" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="xiQpPHeIePDQWWcUJ-XS-22" target="xiQpPHeIePDQWWcUJ-XS-24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-22" value="&lt;font style=&quot;text-wrap-mode: nowrap; font-size: 14px;&quot;&gt;[(E1, EURUSD, H3), (E1, EURUSD, H4),&amp;nbsp;&lt;/font&gt;&lt;div style=&quot;text-wrap-mode: nowrap;&quot;&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;(E2, EURUSD, H3), (E2, EURUSD, H4)...]&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="126.94999999999999" y="394" width="278" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-29" value="&lt;blockquote style=&quot;margin: 0 0 0 40px; border: none; padding: 0px;&quot;&gt;&lt;div&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;2.2: Ejecutar bt.py&lt;/font&gt;&lt;/div&gt;&lt;/blockquote&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="337.5" y="647" width="155" height="31" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-24" value="" style="rounded=1;whiteSpace=wrap;html=1;container=0;" vertex="1" parent="1">
+          <mxGeometry x="196" y="496" width="141.5" height="486" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="xiQpPHeIePDQWWcUJ-XS-6" target="xiQpPHeIePDQWWcUJ-XS-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-6" value="Backtesting.py" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;direction=south;container=0;" vertex="1" parent="1">
+          <mxGeometry x="219" y="611.5" width="95.5" height="95.5" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-12" value="DB" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=15;container=0;" vertex="1" parent="1">
+          <mxGeometry x="236.75" y="874" width="60" height="91" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-27" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="xiQpPHeIePDQWWcUJ-XS-25" target="xiQpPHeIePDQWWcUJ-XS-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-25" value="Métricas y trades" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;container=0;" vertex="1" parent="1">
+          <mxGeometry x="233" y="744" width="67.5" height="80.27" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-34" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" edge="1" parent="1" source="xiQpPHeIePDQWWcUJ-XS-36" target="xiQpPHeIePDQWWcUJ-XS-5">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="314.25000000000165" y="552.75" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-37" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="xiQpPHeIePDQWWcUJ-XS-36" target="xiQpPHeIePDQWWcUJ-XS-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-36" value="Obtener datos" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="209.55" y="522.75" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-38" value="&lt;div style=&quot;text-align: left;&quot;&gt;&lt;font&gt;2.1 Obtener datos de la comb. temp-ticker&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;blockquote style=&quot;font-size: 16px; text-align: left; margin: 0px 0px 0px 40px; border: none; padding: 0px;&quot;&gt;&lt;/blockquote&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="348.55" y="562" width="242" height="41" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-39" value="2. Por cada combinación:" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="337.5" y="472" width="153" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="xiQpPHeIePDQWWcUJ-XS-40" value="&lt;span style=&quot;text-align: left;&quot;&gt;&lt;font&gt;2.3: Guardar resultados en la bd&lt;/font&gt;&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="341.55" y="906.5" width="190" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="agrgxw6-Ba6Qbf7EIvka-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="agrgxw6-Ba6Qbf7EIvka-1" target="xiQpPHeIePDQWWcUJ-XS-22">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="agrgxw6-Ba6Qbf7EIvka-1" value="" style="image;html=1;image=img/lib/clip_art/computers/Laptop_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="239.45" y="276.5" width="53" height="43" as="geometry" />
+        </mxCell>
+        <mxCell id="agrgxw6-Ba6Qbf7EIvka-4" value="&lt;font style=&quot;font-size: 40px;&quot;&gt;&lt;b style=&quot;&quot;&gt;Backtesting Module&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="227" y="43" width="396" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="3h9dfgHayXBDRgzSo_S3" name="Strategy Module">
+    <mxGraphModel dx="1301" dy="742" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="IEHmkWSCKJYy7_Omc2nW-2" value="&lt;span style=&quot;text-wrap-mode: nowrap;&quot;&gt;Quiero ejecutar la estrategia E1&lt;/span&gt;&lt;div style=&quot;text-wrap-mode: nowrap;&quot;&gt;Para el ticker EURUSD&lt;/div&gt;&lt;div style=&quot;text-wrap-mode: nowrap;&quot;&gt;para las temporalidades H3 por favor :)&lt;/div&gt;" style="whiteSpace=wrap;html=1;shape=mxgraph.basic.roundRectCallout;dx=30;dy=15;size=5;boundedLbl=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="78" y="218" width="261" height="76" as="geometry" />
+        </mxCell>
+        <mxCell id="IEHmkWSCKJYy7_Omc2nW-3" value="Meta Trader 5" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;direction=south;" vertex="1" parent="1">
+          <mxGeometry x="668" y="361.25" width="117" height="117" as="geometry" />
+        </mxCell>
+        <mxCell id="IEHmkWSCKJYy7_Omc2nW-21" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="IEHmkWSCKJYy7_Omc2nW-24" target="IEHmkWSCKJYy7_Omc2nW-9">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="164" y="333" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IEHmkWSCKJYy7_Omc2nW-4" value="Vos" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="1">
+          <mxGeometry x="65" y="301" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="IEHmkWSCKJYy7_Omc2nW-8" value="&lt;blockquote style=&quot;margin: 0 0 0 40px; border: none; padding: 0px;&quot;&gt;&lt;div&gt;&lt;font style=&quot;font-size: 12px;&quot;&gt;2. Ejecutar bt.py&lt;/font&gt;&lt;/div&gt;&lt;/blockquote&gt;" style="text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="407.5" y="514" width="145" height="31" as="geometry" />
+        </mxCell>
+        <mxCell id="IEHmkWSCKJYy7_Omc2nW-26" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="1" source="IEHmkWSCKJYy7_Omc2nW-9" target="IEHmkWSCKJYy7_Omc2nW-24">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IEHmkWSCKJYy7_Omc2nW-9" value="" style="rounded=1;whiteSpace=wrap;html=1;container=0;" vertex="1" parent="1">
+          <mxGeometry x="266" y="363" width="141.5" height="350" as="geometry" />
+        </mxCell>
+        <mxCell id="IEHmkWSCKJYy7_Omc2nW-10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" edge="1" parent="1" source="IEHmkWSCKJYy7_Omc2nW-11" target="IEHmkWSCKJYy7_Omc2nW-14">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IEHmkWSCKJYy7_Omc2nW-11" value="Backtesting.py" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;direction=south;container=0;" vertex="1" parent="1">
+          <mxGeometry x="289" y="478.5" width="95.5" height="95.5" as="geometry" />
+        </mxCell>
+        <mxCell id="IEHmkWSCKJYy7_Omc2nW-14" value="Métricas y gráfico" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;container=0;" vertex="1" parent="1">
+          <mxGeometry x="303" y="611" width="67.5" height="80.27" as="geometry" />
+        </mxCell>
+        <mxCell id="IEHmkWSCKJYy7_Omc2nW-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;startArrow=classic;startFill=1;" edge="1" parent="1" source="IEHmkWSCKJYy7_Omc2nW-17" target="IEHmkWSCKJYy7_Omc2nW-3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="384.25000000000165" y="419.75" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IEHmkWSCKJYy7_Omc2nW-16" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="IEHmkWSCKJYy7_Omc2nW-17" target="IEHmkWSCKJYy7_Omc2nW-11">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="IEHmkWSCKJYy7_Omc2nW-17" value="Obtener datos" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="279.55" y="389.75" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="IEHmkWSCKJYy7_Omc2nW-18" value="&lt;div style=&quot;text-align: left;&quot;&gt;&lt;font&gt;1. Obtener datos de la comb. temp-ticker&lt;/font&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;blockquote style=&quot;font-size: 16px; text-align: left; margin: 0px 0px 0px 40px; border: none; padding: 0px;&quot;&gt;&lt;/blockquote&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="422.55" y="429" width="235" height="41" as="geometry" />
+        </mxCell>
+        <mxCell id="IEHmkWSCKJYy7_Omc2nW-23" value="Tomá rey" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="155" y="743" width="67" height="26" as="geometry" />
+        </mxCell>
+        <mxCell id="IEHmkWSCKJYy7_Omc2nW-24" value="" style="image;html=1;image=img/lib/clip_art/computers/Laptop_128x128.png" vertex="1" parent="1">
+          <mxGeometry x="102" y="313" width="53" height="43" as="geometry" />
+        </mxCell>
+        <mxCell id="ZJvgldXAdCKSlZvb_Yry-1" value="&lt;font style=&quot;font-size: 40px;&quot;&gt;&lt;b style=&quot;&quot;&gt;Backtesting Module&lt;/b&gt;&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="227" y="109" width="396" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

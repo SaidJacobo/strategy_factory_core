@@ -1,0 +1,40 @@
+<!-- Modal de Bootstrap -->
+<div class="modal fade" id="botsModal" tabindex="-1" aria-labelledby="portfoliosModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xs">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="portfoliosModalLabel">Bots Weights</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="max-height: 800px; overflow-y: auto;">
+                <input type="hidden" id="id" name="id" value="{{ vm.SystemId }}">
+
+                <div class="table-responsive">
+                    <table id="weightsTable" class="table table-custom">
+                        <thead>
+                            <tr>
+                                <th>Portfolio</th>
+                                <th>Weight</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pf_bt in vm.SystemWeights %}
+                                <tr>
+                                    <td>
+                                        {{ pf_bt.PortfolioName }}
+                                    </td>
+                                    <td>
+                                        <input type="number" id="{{ pf_bt.PortfolioId }}" name="portfolio-id" class="form-control" min="0" step="0.01" value="{{ pf_bt.PortfolioWeight }}" required>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="saveWeightsButton" class="btn btn-primary">Save</button>
+            </div>
+        </div>
+    </div>
+</div>

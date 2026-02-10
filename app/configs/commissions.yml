@@ -1,0 +1,127 @@
+# Comisiones para la cuenta Swing de FTMO
+# Valores basados en la información oficial de FTMO
+
+# Acciones - Comisión 0.0040% por lote
+AAPL: 0.0040
+BABA: 0.0040
+BAC: 0.0040
+BAYGn: 0.0040
+DBKGn: 0.0040
+GOOG: 0.0040
+IBE: 0.0040
+LVMH: 0.0040
+META: 0.0040
+MSFT: 0.0040
+NFLX: 0.0040
+NVDA: 0.0040
+PFE: 0.0040
+RACE: 0.0040
+T: 0.0040
+TSLA: 0.0040
+V: 0.0040
+VOWG_p: 0.0040
+WMT: 0.0040
+ZM: 0.0040
+
+# Criptomonedas - Sin comisión
+ADAUSD: 0
+BTCUSD: 0
+DASHUSD: 0
+DOGEUSD: 0
+DOTUSD: 0
+ETHUSD: 0
+LTCUSD: 0
+NEOUSD: 0
+XMRUSD: 0
+XRPUSD: 0
+
+# Materias Primas - Sin comisión
+COCOA.c: 0
+COFFEE.c: 0
+COTTON.c: 0
+CORN.c: 0
+SOYBEAN.c: 0
+SUGAR.c: 0
+WHEAT.c: 0
+
+# Forex - Comisión $3 por lote
+AUDCAD: 3
+AUDCHF: 3
+AUDJPY: 3
+AUDNZD: 3
+AUDUSD: 3
+CADCHF: 3
+CADJPY: 3
+CHFJPY: 3
+EURAUD: 3
+EURCAD: 3
+EURCHF: 3
+EURCZK: 3
+EURGBP: 3
+EURHUF: 3
+EURJPY: 3
+EURNZD: 3
+EURUSD: 3
+EURNOK: 3
+EURPLN: 3
+GBPAUD: 3
+GBPCAD: 3
+GBPCHF: 3
+GBPJPY: 3
+GBPNZD: 3
+GBPUSD: 3
+NZDCAD: 3
+NZDCHF: 3
+NZDJPY: 3
+NZDUSD: 3
+USDCAD: 3
+USDCHF: 3
+USDCNH: 3
+USDJPY: 3
+USDCZK: 3
+USDHKD: 3
+USDHUF: 3
+USDILS: 3
+USDMXN: 3
+USDNOK: 3
+USDPLN: 3
+USDSGD: 3
+USDZAR: 3
+USDSEK: 3
+
+# Índices - Sin comisión
+AUS200.cash: 0
+EU50.cash: 0
+FRA40.cash: 0
+GER40.cash: 0
+JP225.cash: 0
+UK100.cash: 0
+US100.cash: 0
+US30.cash: 0
+US500.cash: 0
+
+# Metales - Comisión 0.0010% por lote
+XAGUSD: 0.0010
+XAGEUR: 0.0010
+XAGAUD: 0.0010
+XAUUSD: 0.0010
+XAUEUR: 0.0010
+XAUAUD: 0.0010
+XPDUSD: 0.0010
+XPTUSD: 0.0010
+XCUUSD: 0.0010
+
+# Energía - Sin comisión (incluidos en índices)
+HEATOIL.c: 0
+NATGAS.cash: 0
+UKOIL.cash: 0
+USOIL.cash: 0
+
+# Índices Menores - Sin comisión
+HK50.cash: 0
+N25.cash: 0
+SPN35.cash: 0
+US2000.cash: 0
+
+# DXY - Sin comisión
+DXY.cash: 0

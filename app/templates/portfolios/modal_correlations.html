@@ -1,0 +1,21 @@
+<!-- Modal de Bootstrap -->
+<div class="modal fade" id="botsModal" tabindex="-1" aria-labelledby="botsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="botsModalLabel">Correlation Plot</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="max-height: 800px; overflow-y: auto;">
+                
+                <div id="correlation-plot"></div>
+
+                <!-- Guardar los datos del gráfico en un script JSON -->
+                <script id="correlation-plot-data" type="application/json">
+                    {{ correlation_plot | safe }}
+                </script>
+
+            </div>
+        </div>
+    </div>
+</div>

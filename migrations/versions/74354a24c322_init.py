@@ -1,8 +1,8 @@
-"""inicializacion de base de datos
+"""init
 
-Revision ID: 8a0e7a6973b9
+Revision ID: 74354a24c322
 Revises: 
-Create Date: 2025-06-22 14:58:34.803618
+Create Date: 2025-09-23 12:53:24.162907
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '8a0e7a6973b9'
+revision: str = '74354a24c322'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -32,11 +32,23 @@ def upgrade() -> None:
     sa.Column('Value', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('Id')
     )
+    op.create_table('Portfolios',
+    sa.Column('Id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('Name', sa.String(), nullable=False),
+    sa.Column('Description', sa.String(), nullable=True),
+    sa.PrimaryKeyConstraint('Id')
+    )
     op.create_table('Strategies',
     sa.Column('Id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('Name', sa.String(), nullable=False),
     sa.Column('Description', sa.String(), nullable=False),
     sa.Column('MetaTraderName', sa.String(length=16), nullable=False),
+    sa.PrimaryKeyConstraint('Id')
+    )
+    op.create_table('Systems',
+    sa.Column('Id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('Name', sa.String(), nullable=False),
+    sa.Column('Description', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('Id')
     )
     op.create_table('Timeframes',
@@ -46,6 +58,44 @@ def upgrade() -> None:
     sa.Column('Selected', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('Id')
     )
+    op.create_table('GroupedMetrics',
+    sa.Column('Id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('SystemId', sa.Integer(), nullable=True),
+    sa.Column('PortfolioId', sa.Integer(), nullable=True),
+    sa.Column('Return', sa.Float(), nullable=False),
+    sa.Column('Drawdown', sa.Float(), nullable=False),
+    sa.Column('RreturnDd', sa.Float(), nullable=False),
+    sa.Column('SharpeRatio', sa.Float(), nullable=True),
+    sa.Column('JarqueBeraStat', sa.Float(), nullable=True),
+    sa.Column('JarqueBeraPValue', sa.Float(), nullable=True),
+    sa.Column('Skew', sa.Float(), nullable=True),
+    sa.Column('Kurtosis', sa.Float(), nullable=True),
+    sa.Column('PositiveHits', sa.Float(), nullable=True),
+    sa.Column('NegativeHits', sa.Float(), nullable=True),
+    sa.Column('SuccessRatio', sa.Float(), nullable=True),
+    sa.Column('MeanTimeToPositive', sa.Float(), nullable=True),
+    sa.Column('MeanTimeToNegative', sa.Float(), nullable=True),
+    sa.Column('StdTimeToPositive', sa.Float(), nullable=True),
+    sa.Column('StdTimeToNegative', sa.Float(), nullable=True),
+    sa.Column('MeanReturns', sa.Float(), nullable=True),
+    sa.Column('StdReturns', sa.Float(), nullable=True),
+    sa.Column('MarginCalls', sa.Float(), nullable=True),
+    sa.Column('StopOuts', sa.Float(), nullable=True),
+    sa.Column('StabilityRatio', sa.Float(), nullable=True),
+    sa.ForeignKeyConstraint(['PortfolioId'], ['Portfolios.Id'], ),
+    sa.ForeignKeyConstraint(['SystemId'], ['Systems.Id'], ),
+    sa.PrimaryKeyConstraint('Id')
+    )
+    op.create_table('SystemPortfolios',
+    sa.Column('Id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('SystemId', sa.Integer(), nullable=True),
+    sa.Column('PortfolioId', sa.Integer(), nullable=True),
+    sa.Column('Weight', sa.Float(), nullable=True),
+    sa.ForeignKeyConstraint(['PortfolioId'], ['Portfolios.Id'], ),
+    sa.ForeignKeyConstraint(['SystemId'], ['Systems.Id'], ),
+    sa.PrimaryKeyConstraint('Id')
+    )
+    op.create_index(op.f('ix_SystemPortfolios_PortfolioId'), 'SystemPortfolios', ['PortfolioId'], unique=False)
     op.create_table('Tickers',
     sa.Column('Id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('CategoryId', sa.Integer(), nullable=True),
@@ -147,6 +197,16 @@ def upgrade() -> None:
     sa.ForeignKeyConstraint(['BotPerformanceId'], ['BotPerformances.Id'], ),
     sa.PrimaryKeyConstraint('Id')
     )
+    op.create_table('PortfoliosBacktests',
+    sa.Column('Id', sa.Integer(), autoincrement=True, nullable=False),
+    sa.Column('PortfolioId', sa.Integer(), nullable=True),
+    sa.Column('BotPerformanceId', sa.Integer(), nullable=True),
+    sa.Column('Weight', sa.Float(), nullable=True),
+    sa.ForeignKeyConstraint(['BotPerformanceId'], ['BotPerformances.Id'], ),
+    sa.ForeignKeyConstraint(['PortfolioId'], ['Portfolios.Id'], ),
+    sa.PrimaryKeyConstraint('Id')
+    )
+    op.create_index(op.f('ix_PortfoliosBacktests_PortfolioId'), 'PortfoliosBacktests', ['PortfolioId'], unique=False)
     op.create_table('RandomTests',
     sa.Column('Id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('BotPerformanceId', sa.Integer(), nullable=False),
@@ -216,6 +276,8 @@ def downgrade() -> None:
     op.drop_table('MetricsWarehouse')
     op.drop_table('Trades')
     op.drop_table('RandomTests')
+    op.drop_index(op.f('ix_PortfoliosBacktests_PortfolioId'), table_name='PortfoliosBacktests')
+    op.drop_table('PortfoliosBacktests')
     op.drop_table('MontecarloTests')
     op.drop_table('LuckTests')
     op.drop_table('BotTradePerformances')
@@ -224,8 +286,13 @@ def downgrade() -> None:
     op.drop_table('BotPerformances')
     op.drop_table('Bots')
     op.drop_table('Tickers')
+    op.drop_index(op.f('ix_SystemPortfolios_PortfolioId'), table_name='SystemPortfolios')
+    op.drop_table('SystemPortfolios')
+    op.drop_table('GroupedMetrics')
     op.drop_table('Timeframes')
+    op.drop_table('Systems')
     op.drop_table('Strategies')
+    op.drop_table('Portfolios')
     op.drop_table('Configs')
     op.drop_table('Categories')
     # ### end Alembic commands ###
